@@ -1,5 +1,7 @@
 package com.example.booktrackerapp.screens
 
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,14 +16,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.example.booktrackerapp.R
+import com.example.booktrackerapp.viewModel.HomeViewModel
+import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
+
 
 
 
@@ -29,7 +39,10 @@ import com.example.booktrackerapp.widgets.SimpleTopAppBar
 fun HomeScreen(navController: NavController) {
     // State to hold the value of the search query
     val searchTextState = remember { mutableStateOf("") }
-
+    val viewModel: HomeViewModel = viewModel()
+    val bookListState = remember { mutableStateOf<List<BookItem>>(emptyList()) }
+    val errorState = remember { mutableStateOf("") }
+    
     BookTrackerAppTheme {
         Scaffold(
             topBar = { SimpleTopAppBar(navController, title = "Home", backButton = false) },
@@ -59,13 +72,38 @@ fun HomeScreen(navController: NavController) {
                             .padding(end = 8.dp),
                         shape = RoundedCornerShape(16.dp),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { /* Handle search action */ })
+
+                        //hier für keyboardActions wurde was gemacht.
+                        keyboardActions = KeyboardActions(onDone = {
+                            viewModel.searchBookByISBN(
+                                searchTextState.value,
+                                onSuccess = { books ->
+                                    bookListState.value = books
+                                    errorState.value = ""
+                                },
+                                onError = { error ->
+                                    errorState.value = error
+                                }
+                            )
+                        })
                     )
 
                     // Icon to search
                     IconButton(
                         onClick = {
                             //TODO
+                            viewModel.searchBookByISBN(
+                                searchTextState.value,
+
+                                //hier wurde was gemacht.
+                                onSuccess = {books ->
+                                    bookListState.value = books
+                                    errorState.value = ""
+                                },
+                                onError = { error ->
+                                    errorState.value = error
+                                }
+                            )
                         }
                     ) {
                         Icon(
@@ -73,6 +111,34 @@ fun HomeScreen(navController: NavController) {
                             contentDescription = "Camera",
                             tint = Color.Black
                         )
+                    }
+                }
+
+                // Display error messages
+                if (errorState.value.isNotEmpty()) {
+                    Text(text = errorState.value, color = Color.Red)
+                }
+
+                // Display book results (basic implementation)
+                Column {
+                    bookListState.value.forEach { bookItem ->
+                        Text(text = bookItem.volumeInfo.title)
+                        bookItem.volumeInfo.authors?.let { authors ->
+                            Text(text = "Authors: ${authors.joinToString(", ")}")
+                        }
+                        bookItem.volumeInfo.imageLinks?.thumbnail?.let { thumbnail ->
+                            Log.d("ThumbnailURL", thumbnail) // Add this for debugging purposes
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(thumbnail)
+                                    .crossfade(true)
+                                    .placeholder(R.drawable.works) // Replace with your placeholder drawable
+                                    .error(R.drawable.error) // Replace with your error drawable
+                                    .build(),
+                                contentDescription = "Book Cover",
+                                modifier = Modifier.size(100.dp)
+                            )
+                        }
                     }
                 }
 
@@ -101,5 +167,12 @@ fun HomeScreen(navController: NavController) {
 
             }
         }
+
     }
 }
+
+fun displayBookDetails(books: List<BookItem>) {
+
+}
+
+
