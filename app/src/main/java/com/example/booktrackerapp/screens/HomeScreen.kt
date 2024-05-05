@@ -29,6 +29,7 @@ import com.example.booktrackerapp.R
 import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
+import com.example.booktrackerapp.widgets.BookListScreen
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
@@ -119,28 +120,8 @@ fun HomeScreen(navController: NavController) {
                     Text(text = errorState.value, color = Color.Red)
                 }
 
-                // Display book results (basic implementation)
-                Column {
-                    bookListState.value.forEach { bookItem ->
-                        Text(text = bookItem.volumeInfo.title)
-                        bookItem.volumeInfo.authors?.let { authors ->
-                            Text(text = "Authors: ${authors.joinToString(", ")}")
-                        }
-                        bookItem.volumeInfo.imageLinks?.thumbnail?.let { thumbnail ->
-                            Log.d("ThumbnailURL", thumbnail) // Add this for debugging purposes
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(thumbnail)
-                                    .crossfade(true)
-                                    .placeholder(R.drawable.works) // Replace with your placeholder drawable
-                                    .error(R.drawable.error) // Replace with your error drawable
-                                    .build(),
-                                contentDescription = "Book Cover",
-                                modifier = Modifier.size(100.dp)
-                            )
-                        }
-                    }
-                }
+                // Display book results using the BookListScreen composable
+                BookListScreen(books = bookListState.value)
 
                 // Button with camera icon
                 FloatingActionButton(
