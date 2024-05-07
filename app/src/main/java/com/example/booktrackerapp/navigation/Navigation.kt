@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.booktrackerapp.screens.HomeScreen
 import com.example.booktrackerapp.screens.LibraryScreen
 import com.example.booktrackerapp.screens.Userscreen
+import com.example.booktrackerapp.screens.CameraScreen
 
 
 @Composable
@@ -28,6 +29,10 @@ fun Navigation() {
         composable(Screen.UserScreen.route)
         {
             Userscreen(navController = navController)
+        }
+        composable(Screen.CameraScreen.route)
+        {
+            CameraScreen(navController = navController)
         }
     }
 }
