@@ -23,6 +23,11 @@ class HomeViewModel : ViewModel() {
     ) {
         val isbn = normalizeISBN(rawIsbn)
 
+        if (isbn.isEmpty()) {
+            onSuccess(emptyList()) // Empty list when ISBN is empty
+            return
+        }
+
         if (!isValidISBN(isbn)) {
             onError("Invalid ISBN. Please check the number again.")
             return

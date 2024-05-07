@@ -1,7 +1,5 @@
 package com.example.booktrackerapp.screens
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,15 +14,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
-import coil.request.ImageRequest
 import com.example.booktrackerapp.R
 import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.api.BookItem
@@ -43,7 +37,8 @@ fun HomeScreen(navController: NavController) {
     val viewModel: HomeViewModel = viewModel()
     val bookListState = remember { mutableStateOf<List<BookItem>>(emptyList()) }
     val errorState = remember { mutableStateOf("") }
-    
+    val isBookListVisible = bookListState.value.isNotEmpty() // Check if book list is not empty
+
     BookTrackerAppTheme {
         Scaffold(
             topBar = { SimpleTopAppBar(navController, title = "Home", backButton = false) },
@@ -121,7 +116,10 @@ fun HomeScreen(navController: NavController) {
                 }
 
                 // Display book results using the BookListScreen composable
-                BookListScreen(books = bookListState.value)
+                // Display book results using the BookListScreen composable if list is not empty
+                if (isBookListVisible) {
+                    BookListScreen(books = bookListState.value)
+                }
 
                 // Button with camera icon
                 FloatingActionButton(
@@ -130,7 +128,7 @@ fun HomeScreen(navController: NavController) {
                               //TODO
                     },
                     modifier = Modifier
-                        .padding(top = 100.dp)
+                        .padding(100.dp)
                         .size(100.dp)
                         .align(Alignment.CenterHorizontally),
                     shape = CircleShape,
@@ -152,8 +150,8 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
-fun displayBookDetails(books: List<BookItem>) {
+//fun displayBookDetails(books: List<BookItem>) {
 
-}
+//}
 
 
