@@ -32,8 +32,7 @@ import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.widgets.BookListScreen
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
-
-
+import com.example.booktrackerapp.widgets.SingleBookView
 
 
 @Composable
@@ -41,7 +40,8 @@ fun HomeScreen(navController: NavController) {
     // State to hold the value of the search query
     val searchTextState = remember { mutableStateOf("") }
     val viewModel: HomeViewModel = viewModel()
-    val bookListState = remember { mutableStateOf<List<BookItem>>(emptyList()) }
+    //val bookListState = remember { mutableStateOf<List<BookItem>>(emptyList()) }
+    val singlebookState = remember { mutableStateOf<BookItem?>(null) }
     val errorState = remember { mutableStateOf("") }
     
     BookTrackerAppTheme {
@@ -79,7 +79,7 @@ fun HomeScreen(navController: NavController) {
                             viewModel.searchBookByISBN(
                                 searchTextState.value,
                                 onSuccess = { books ->
-                                    bookListState.value = books
+                                    singlebookState.value = books
                                     errorState.value = ""
                                 },
                                 onError = { error ->
@@ -98,7 +98,7 @@ fun HomeScreen(navController: NavController) {
 
                                 //hier wurde was gemacht.
                                 onSuccess = {books ->
-                                    bookListState.value = books
+                                    singlebookState.value = books
                                     errorState.value = ""
                                 },
                                 onError = { error ->
@@ -121,7 +121,12 @@ fun HomeScreen(navController: NavController) {
                 }
 
                 // Display book results using the BookListScreen composable
-                BookListScreen(books = bookListState.value)
+                //BookListScreen(books = bookListState.value)
+
+                // Display the single book result using the SingleBookView composable
+                singlebookState.value?.let {
+                    SingleBookView(bookItem = it)
+                }
 
                 // Button with camera icon
                 FloatingActionButton(

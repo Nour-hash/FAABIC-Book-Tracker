@@ -1,3 +1,6 @@
+import java.util.Properties
+
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -7,9 +10,13 @@ kotlin {
     jvmToolchain(17)
 }
 
+
+
 android {
     namespace = "com.example.booktrackerapp"
     compileSdk = 34
+
+   // val googleApiKey = System.getenv("GOOGLE_API_KEY")
 
     defaultConfig {
         applicationId = "com.example.booktrackerapp"
@@ -19,7 +26,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        //Properties properties = new Properties()
+        //properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField("String","GOOGLE_API_KEY", "\"${System.getenv("GOOGLE_API_KEY")}\"")
     }
+
+
 
     buildTypes {
         release {
@@ -43,6 +57,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
@@ -52,6 +67,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
 
 dependencies {
@@ -101,3 +117,4 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+

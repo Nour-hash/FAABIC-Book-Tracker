@@ -1,11 +1,13 @@
 package com.example.booktrackerapp.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.api.GoogleBooksApiClient
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.BuildConfig
+
 
 
 class HomeViewModel : ViewModel() {
@@ -18,7 +20,8 @@ class HomeViewModel : ViewModel() {
     }
     fun searchBookByISBN(
         rawIsbn: String,
-        onSuccess: (List<BookItem>) -> Unit,
+        //onSuccess: (List<BookItem>) -> Unit,
+        onSuccess: (BookItem) -> Unit,
         onError: (String) -> Unit
     ) {
         val isbn = normalizeISBN(rawIsbn)
@@ -31,9 +34,13 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val apiKey = "AIzaSyD0k6a0htp8NSBRC0229itvsTaQ4DPLipE"
-                val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN(isbn, apiKey)
+               // val apiKey = BuildConfig.
+                val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
+
+                // Debugging: Ausgabe der Ergebnisse prüfen
+                Log.d("BookSearch", "Total items found: ${bookResponse.items.size}")
                 if(bookResponse.items.isNotEmpty()){
-                    onSuccess(bookResponse.items)
+                    onSuccess(bookResponse.items.first())
                 } else {
                     onError("No books found for this ISBN.")
                 }
