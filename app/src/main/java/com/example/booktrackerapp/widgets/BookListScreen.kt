@@ -71,7 +71,7 @@ fun SingleBookView(bookItem: BookItem) {
             Log.d("BookCoverURL", thumbnail) // Debug-Ausgabe zur Kontrolle der URL
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(thumbnail)
+                    .data(thumbnail.replace("http://", "https://"))
                     .crossfade(true)
                     .placeholder(R.drawable.works) // Replace with your drawable
                     .error(R.drawable.error) // Replace with your drawable
@@ -84,6 +84,9 @@ fun SingleBookView(bookItem: BookItem) {
                 contentDescription = "Book Cover",
                 modifier = Modifier.size(100.dp)
             )
+        } ?: run {
+            // Handle case where there is no thumbnail
+            Text(text = "No cover image available.")
         }
     }
 }

@@ -39,6 +39,8 @@ class HomeViewModel : ViewModel() {
 
                 // Debugging: Ausgabe der Ergebnisse prüfen
                 Log.d("BookSearch", "Total items found: ${bookResponse.items.size}")
+                Log.d("BookSearch", "Book title: ${bookResponse.items.first().volumeInfo.title}")
+                Log.d("BookSearch", "Thumbnail URL: ${bookResponse.items.first().volumeInfo.imageLinks?.thumbnail}")
                 if(bookResponse.items.isNotEmpty()){
                     onSuccess(bookResponse.items.first())
                 } else {
