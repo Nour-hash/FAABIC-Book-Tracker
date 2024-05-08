@@ -1,5 +1,6 @@
 package com.example.booktrackerapp.screens
 
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,8 +27,6 @@ import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.widgets.BookListScreen
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
-
-
 
 
 @Composable
@@ -126,6 +125,9 @@ fun HomeScreen(navController: NavController) {
                     onClick = {
                         // Handle opening camera
                               //TODO
+
+                        //Firebase.analytics.logEvent("open_camera", null)
+
                     },
                     modifier = Modifier
                         .padding(100.dp)
