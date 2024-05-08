@@ -29,10 +29,11 @@ import com.example.booktrackerapp.R
 import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
-import com.example.booktrackerapp.widgets.BookListScreen
+import com.example.booktrackerapp.widgets.BookRow
+//import com.example.booktrackerapp.widgets.BookListScreen
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
-import com.example.booktrackerapp.widgets.SingleBookView
+//import com.example.booktrackerapp.widgets.SingleBookView
 
 
 @Composable
@@ -125,7 +126,7 @@ fun HomeScreen(navController: NavController) {
 
                 // Display the single book result using the SingleBookView composable
                 singlebookState.value?.let {
-                    SingleBookView(bookItem = it)
+                    BookRow(book = it)
                 }
 
                 // Button with camera icon
