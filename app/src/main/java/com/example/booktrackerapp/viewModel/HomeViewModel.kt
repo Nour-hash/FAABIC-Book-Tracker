@@ -1,14 +1,57 @@
 package com.example.booktrackerapp.viewModel
 
-import androidx.lifecycle.ViewModel
+import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.api.GoogleBooksApiClient
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.booktrackerapp.model.service.AccountService
+import com.example.booktrackerapp.navigation.Screen
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val accountService: AccountService):BookTrackerViewModel() {
+
+    fun onSignOutClick() {
+        launchCatching {
+            accountService.signOut()
+        }
+    }
+
+    fun onDeleteAccountClick() {
+        launchCatching {
+            accountService.deleteAccount()
+        }
+    }
+
+    fun getUsername(): String? {
+        return accountService.userName
+    }
+
+    fun getUserEmail(): String? {
+        return accountService.userEmail
+    }
+
+    fun getUserPhotoUrl(): Uri? {
+        return accountService.userPhotoUrl
+    }
 
 
-class HomeViewModel : ViewModel() {
+    fun initialize(navController: NavController) {
+        launchCatching {
+            accountService.currentUser.collect { user ->
+                if (user == null) {
+                    navController.navigate(Screen.SplashScreen.route) {
+                        popUpTo(navController.graph.startDestinationId)
+                    }
+                }
+            }
+        }
+    }
+
     fun normalizeISBN(isbn: String): String {
         return isbn.filter { it.isDigit() }
     }

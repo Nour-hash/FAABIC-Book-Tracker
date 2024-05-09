@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,10 +31,12 @@ import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
+
+    viewModel.initialize(navController)
+
     // State to hold the value of the search query
     val searchTextState = remember { mutableStateOf("") }
-    val viewModel: HomeViewModel = viewModel()
     val bookListState = remember { mutableStateOf<List<BookItem>>(emptyList()) }
     val errorState = remember { mutableStateOf("") }
     val isBookListVisible = bookListState.value.isNotEmpty() // Check if book list is not empty
