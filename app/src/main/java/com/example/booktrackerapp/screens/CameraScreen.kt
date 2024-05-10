@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageProxy
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
+import androidx.core.content.ContextCompat
 
 
 @Composable
@@ -62,7 +65,12 @@ fun CameraScreen(navController: NavController){
                 modifier = Modifier.align(Alignment.BottomCenter),
 
                 onTakePicture = {
-                   // TODO
+                    val mainExecutor = ContextCompat.getMainExecutor(context)
+                    cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback(){
+                       override fun onCaptureSuccess(image: ImageProxy) {
+                           image.toBitmap()
+                       }
+                   })
                 },
 
                 onSwitchCamera = {
@@ -76,6 +84,10 @@ fun CameraScreen(navController: NavController){
 
                 onCancelPreview = {
                     navController.navigate("homescreen")
+                },
+
+                onOpenGallery = {
+                    // TODO
                 }
             )
         }
@@ -90,32 +102,50 @@ fun CameraControls(
     modifier: Modifier = Modifier,
     onTakePicture: () -> Unit,
     onSwitchCamera: () -> Unit,
-    onCancelPreview: () -> Unit
+    onCancelPreview: () -> Unit,
+    onOpenGallery: () -> Unit
 ) {
-    Row(modifier = modifier.padding(16.dp)) {
-        IconButton(onClick = onSwitchCamera, modifier = Modifier.size(60.dp)) {
-            Icon(
-                imageVector = Icons.Default.Refresh,
-                contentDescription = "Switch Camera",
-                tint = androidx.compose.ui.graphics.Color.White
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        IconButton(onClick = onTakePicture, modifier = Modifier.size(60.dp)) {
-            Icon(
-                imageVector = Icons.Default.AddCircle,
-                contentDescription = "Take Picture",
-                tint = androidx.compose.ui.graphics.Color.White,
-                modifier = Modifier.size(80.dp)
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        IconButton(onClick = onCancelPreview, modifier = Modifier.size(60.dp)) {
+    Box(modifier = modifier.fillMaxSize()) {
+        IconButton(onClick = onCancelPreview, modifier = Modifier.align(Alignment.TopStart)) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Cancel Preview",
                 tint = androidx.compose.ui.graphics.Color.White
             )
+        }
+
+        Row(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            IconButton(onClick = onOpenGallery , modifier = Modifier.size(60.dp)) {
+                Icon(
+                    imageVector = Icons.Default.AccountBox,
+                    contentDescription = "Switch Camera",
+                    tint = androidx.compose.ui.graphics.Color.White
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(onClick = onTakePicture, modifier = Modifier.size(60.dp)) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = "Take Picture",
+                    tint = androidx.compose.ui.graphics.Color.White
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(onClick = onSwitchCamera, modifier = Modifier.size(60.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Switch Camera",
+                    tint = androidx.compose.ui.graphics.Color.White
+                )
+            }
         }
     }
 }
