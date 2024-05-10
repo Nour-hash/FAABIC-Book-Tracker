@@ -32,8 +32,6 @@ import com.example.booktrackerapp.R
 import com.example.booktrackerapp.navigation.Screen
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.viewModel.SignInViewModel
-import com.example.booktrackerapp.widgets.SimpleBottomAppBar
-import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hiltViewModel()) {

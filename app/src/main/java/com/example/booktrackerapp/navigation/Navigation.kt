@@ -6,7 +6,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.booktrackerapp.model.service.AccountService
 import com.example.booktrackerapp.screens.HomeScreen
 import com.example.booktrackerapp.screens.LibraryScreen
 import com.example.booktrackerapp.screens.SignInScreen
@@ -19,7 +18,6 @@ import com.example.booktrackerapp.viewModel.HomeViewModel
 fun Navigation() {
     val navController = rememberNavController()
     val viewModel: HomeViewModel = viewModel()
-    val accountService: AccountService
 
     NavHost(
         navController = navController,
