@@ -1,4 +1,3 @@
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -15,8 +14,6 @@ kotlin {
 android {
     namespace = "com.example.booktrackerapp"
     compileSdk = 34
-
-
 
     defaultConfig {
         applicationId = "com.example.booktrackerapp"
@@ -50,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
@@ -121,4 +119,17 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("com.google.dagger:hilt-android:2.50")
     kapt("com.google.dagger:hilt-compiler:2.50")
+
+    //CameraX
+    implementation ("androidx.camera:camera-core:1.3.3")
+    implementation ("androidx.camera:camera-camera2:1.3.3")
+    implementation ("androidx.camera:camera-lifecycle:1.3.3")
+    implementation ("androidx.camera:camera-video:1.3.3")
+
+    implementation ("androidx.camera:camera-view:1.3.3")
+    implementation ("androidx.camera:camera-extensions:1.3.3")
+
+    //Accompanist Library
+    implementation ("com.google.accompanist:accompanist-permissions:0.34.0")
+
 }

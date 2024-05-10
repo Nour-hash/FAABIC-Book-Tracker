@@ -1,6 +1,5 @@
 package com.example.booktrackerapp.navigation
 
-
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -13,6 +12,7 @@ import com.example.booktrackerapp.screens.SignUpScreen
 import com.example.booktrackerapp.screens.SplashScreen
 import com.example.booktrackerapp.screens.Userscreen
 import com.example.booktrackerapp.viewModel.HomeViewModel
+import com.example.booktrackerapp.screens.CameraScreen
 
 @Composable
 fun Navigation() {
@@ -42,6 +42,10 @@ fun Navigation() {
         }
         composable(Screen.SplashScreen.route) {
             SplashScreen(navController = navController)
+        }
+        composable(Screen.CameraScreen.route)
+        {
+            CameraScreen(navController = navController)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.booktrackerapp.screens
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +25,13 @@ import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.widgets.BookRow
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
@@ -36,6 +41,12 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
     val searchTextState = remember { mutableStateOf("") }
     val errorState = remember { mutableStateOf("") }
     val singlebookState = remember { mutableStateOf<BookItem?>(null) }
+
+    //Permissions
+    val cameraPermissionState: PermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+    val hasPermission = cameraPermissionState.status.isGranted
+    val onRequestPermission = cameraPermissionState::launchPermissionRequest
+
 
     BookTrackerAppTheme {
         Scaffold(
@@ -122,11 +133,12 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
                 // Button with camera icon
                 FloatingActionButton(
                     onClick = {
-                        // Handle opening camera
-                              //TODO
-
-                        //Firebase.analytics.logEvent("open_camera", null)
-
+                        //Zu CameraScreen wechseln, wenn Permission erteilt wurde
+                        if (hasPermission) {
+                            navController.navigate("camerascreen")
+                        } else {
+                            onRequestPermission()
+                        }
                     },
                     modifier = Modifier
                         .padding(100.dp)
@@ -147,10 +159,5 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
             }
         }
-
     }
 }
-
-
-
-
