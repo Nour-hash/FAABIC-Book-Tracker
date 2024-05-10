@@ -1,6 +1,5 @@
 package com.example.booktrackerapp.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -17,9 +16,12 @@ private const val SPLASH_TIMEOUT = 1000L
 fun SplashScreen(navController: NavController,
                  viewModel: SplashViewModel = hiltViewModel())
 {
+
     Column() {
         CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
     }
+
+
 
     LaunchedEffect(true) {
         delay(SPLASH_TIMEOUT)
