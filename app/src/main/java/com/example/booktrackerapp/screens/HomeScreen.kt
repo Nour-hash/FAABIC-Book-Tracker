@@ -1,6 +1,7 @@
 package com.example.booktrackerapp.screens
 
-
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,18 +17,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.example.booktrackerapp.R
 import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
-import com.example.booktrackerapp.widgets.BookListScreen
+import com.example.booktrackerapp.widgets.BookRow
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
+
+
 
 
 @Composable
@@ -37,9 +44,9 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
     // State to hold the value of the search query
     val searchTextState = remember { mutableStateOf("") }
-    val bookListState = remember { mutableStateOf<List<BookItem>>(emptyList()) }
+    val viewModel: HomeViewModel = viewModel()
     val errorState = remember { mutableStateOf("") }
-    val isBookListVisible = bookListState.value.isNotEmpty() // Check if book list is not empty
+    val singlebookState = remember { mutableStateOf<BookItem?>(null) }
 
     BookTrackerAppTheme {
         Scaffold(
@@ -76,7 +83,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
                             viewModel.searchBookByISBN(
                                 searchTextState.value,
                                 onSuccess = { books ->
-                                    bookListState.value = books
+                                    singlebookState.value = books
                                     errorState.value = ""
                                 },
                                 onError = { error ->
@@ -95,7 +102,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
                                 //hier wurde was gemacht.
                                 onSuccess = {books ->
-                                    bookListState.value = books
+                                    singlebookState.value = books
                                     errorState.value = ""
                                 },
                                 onError = { error ->
@@ -118,9 +125,11 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
                 }
 
                 // Display book results using the BookListScreen composable
-                // Display book results using the BookListScreen composable if list is not empty
-                if (isBookListVisible) {
-                    BookListScreen(books = bookListState.value)
+                //BookListScreen(books = bookListState.value)
+
+                // Display the single book result using the SingleBookView composable
+                singlebookState.value?.let {
+                    BookRow(book = it)
                 }
 
                 // Button with camera icon
@@ -155,8 +164,6 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
     }
 }
 
-//fun displayBookDetails(books: List<BookItem>) {
 
-//}
 
 

@@ -1,5 +1,6 @@
 package com.example.booktrackerapp.viewModel
 
+import android.util.Log
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.example.booktrackerapp.api.BookItem
@@ -61,15 +62,11 @@ class HomeViewModel @Inject constructor(
     }
     fun searchBookByISBN(
         rawIsbn: String,
-        onSuccess: (List<BookItem>) -> Unit,
+        //onSuccess: (List<BookItem>) -> Unit,
+        onSuccess: (BookItem) -> Unit,
         onError: (String) -> Unit
     ) {
         val isbn = normalizeISBN(rawIsbn)
-
-        if (isbn.isEmpty()) {
-            onSuccess(emptyList()) // Empty list when ISBN is empty
-            return
-        }
 
         if (!isValidISBN(isbn)) {
             onError("Invalid ISBN. Please check the number again.")
@@ -79,9 +76,15 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val apiKey = "AIzaSyD0k6a0htp8NSBRC0229itvsTaQ4DPLipE"
-                val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN(isbn, apiKey)
+               // val apiKey = BuildConfig.
+                val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
+
+                // Debugging: Ausgabe der Ergebnisse prüfen
+                Log.d("BookSearch", "Total items found: ${bookResponse.items.size}")
+                Log.d("BookSearch", "Book title: ${bookResponse.items.first().volumeInfo.title}")
+                Log.d("BookSearch", "Thumbnail URL: ${bookResponse.items.first().volumeInfo.imageLinks?.thumbnail}")
                 if(bookResponse.items.isNotEmpty()){
-                    onSuccess(bookResponse.items)
+                    onSuccess(bookResponse.items.first())
                 } else {
                     onError("No books found for this ISBN.")
                 }

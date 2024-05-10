@@ -1,3 +1,6 @@
+import java.util.Properties
+
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -14,6 +17,8 @@ kotlin {
 android {
     namespace = "com.example.booktrackerapp"
     compileSdk = 34
+
+
 
     defaultConfig {
         applicationId = "com.example.booktrackerapp"
@@ -107,7 +112,7 @@ dependencies {
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
-    
+
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation("com.google.firebase:firebase-analytics")
 
