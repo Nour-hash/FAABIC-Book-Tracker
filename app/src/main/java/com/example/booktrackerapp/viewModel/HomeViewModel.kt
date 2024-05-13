@@ -58,7 +58,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun isValidISBN(isbn: String): Boolean {
-        return isbn.length == 10 || isbn.length == 13 && isbn.all { it.isDigit() }
+        return  isbn.length == 10 || isbn.length == 13 && isbn.all { it.isDigit()  }
     }
     fun searchBookByISBN(
         rawIsbn: String,
