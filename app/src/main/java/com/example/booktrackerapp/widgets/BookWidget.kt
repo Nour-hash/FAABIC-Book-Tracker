@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
@@ -31,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -83,6 +87,8 @@ fun BookItemView(bookItem: BookItem) {
 
 @Composable
 fun BookRow(book: BookItem, navController: NavController) {
+    var isFavorite by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -95,8 +101,13 @@ fun BookRow(book: BookItem, navController: NavController) {
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
         Column {
-            BookCardHeader(imageUrl = book.volumeInfo.imageLinks?.thumbnail ?: "")
-
+            Spacer(modifier = Modifier.height(8.dp))
+            BookCardHeader(
+                imageUrl = book.volumeInfo.imageLinks?.thumbnail ?: "",
+                isFavorite = isFavorite,
+                onFavoriteClick = { isFavorite = !isFavorite }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             BookDetails(modifier = Modifier.padding(12.dp), book = book)
         }
     }
@@ -104,6 +115,8 @@ fun BookRow(book: BookItem, navController: NavController) {
 
 @Composable
 fun BookRowSimple(book: BookItem, navController: NavController) {
+    var isFavorite by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +130,13 @@ fun BookRowSimple(book: BookItem, navController: NavController) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = book.volumeInfo.title, style = MaterialTheme.typography.bodyLarge)
-            BookCardHeader(imageUrl = book.volumeInfo.imageLinks?.thumbnail ?: "")
+            Spacer(modifier = Modifier.height(8.dp))
+            BookCardHeader(
+                imageUrl = book.volumeInfo.imageLinks?.thumbnail ?: "",
+                isFavorite = isFavorite,
+                onFavoriteClick = { isFavorite = !isFavorite }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Text("Authors: ${book.volumeInfo.authors.joinToString(", ")}", style = MaterialTheme.typography.bodySmall)
         }
     }
@@ -125,28 +144,46 @@ fun BookRowSimple(book: BookItem, navController: NavController) {
 
 
 @Composable
-fun BookCardHeader(imageUrl: String) {
+fun BookCardHeader(imageUrl: String, isFavorite: Boolean, onFavoriteClick: () -> Unit) {
     Box(
         modifier = Modifier
             .height(200.dp)
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        if (imageUrl.isNotBlank()) {
-            val secureImageUrl = imageUrl.replace("http://", "https://")
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(secureImageUrl)
-                    .crossfade(true)
-                    .build(),
-                contentScale = ContentScale.Fit,
-                contentDescription = "Book cover",
-                loading = { CircularProgressIndicator() },
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            Text("No cover image available", Modifier.align(Alignment.Center))
-        }
+        BookImage(imageUrl = imageUrl)
+        FavoriteIcon(isFavorite = isFavorite, onFavoriteClick = onFavoriteClick)
+    }
+}
+
+@Composable
+fun BookImage(imageUrl: String) {
+    SubcomposeAsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imageUrl.replace("http://", "https://"))
+            .crossfade(true)
+            .build(),
+        contentDescription = "Book cover",
+        contentScale = ContentScale.Fit,
+        loading = { CircularProgressIndicator() },
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Composable
+fun FavoriteIcon(isFavorite: Boolean, onFavoriteClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        contentAlignment = Alignment.TopEnd
+    ){
+        Icon(
+            modifier = Modifier.clickable(onClick = onFavoriteClick),
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
+            contentDescription = "Toggle Favorite",
+            tint = if (isFavorite) Color.Red else Color.Gray
+        )
     }
 }
 
