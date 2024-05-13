@@ -34,12 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.booktrackerapp.api.BookItem
 
 @Composable
-fun BookListScreen(modifier: Modifier, books: List<BookItem>) {
+fun BookListScreen(modifier: Modifier, books: List<BookItem>, navController : NavController) {
     LazyColumn(
         modifier = modifier
         //Modifier.fillMaxSize(),
@@ -47,7 +48,7 @@ fun BookListScreen(modifier: Modifier, books: List<BookItem>) {
         //verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(books) { bookItem ->
-            BookRow(bookItem)
+            BookRow(bookItem, navController = navController)
         }
     }
 }
@@ -81,11 +82,16 @@ fun BookItemView(bookItem: BookItem) {
 }*/
 
 @Composable
-fun BookRow(book: BookItem) {
+fun BookRow(book: BookItem, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+            .clickable {
+                //val isbn = book.volumeInfo.title
+                val isbn = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: ""
+                navController.navigate("detail/$isbn")
+            },
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
         Column {

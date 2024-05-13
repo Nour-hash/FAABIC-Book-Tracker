@@ -2,6 +2,7 @@ package com.example.booktrackerapp.navigation
 
 sealed class Screen(val route: String) {
     data object HomeScreen : Screen("homescreen")
+    object DetailScreen : Screen("detail")
     data object LibraryScreen : Screen("libraryscreen")
     data object UserScreen :  Screen("userscreen")
     data object SignUpScreen : Screen("signUpscreen")

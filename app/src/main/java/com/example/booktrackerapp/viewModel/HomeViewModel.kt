@@ -1,15 +1,15 @@
 package com.example.booktrackerapp.viewModel
 
-import android.util.Log
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.api.GoogleBooksApiClient
-import kotlinx.coroutines.launch
-import androidx.navigation.NavController
 import com.example.booktrackerapp.model.service.AccountService
 import com.example.booktrackerapp.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,6 +83,7 @@ class HomeViewModel @Inject constructor(
                 Log.d("BookSearch", "Total items found: ${bookResponse.items.size}")
                 Log.d("BookSearch", "Book title: ${bookResponse.items.first().volumeInfo.title}")
                 Log.d("BookSearch", "Thumbnail URL: ${bookResponse.items.first().volumeInfo.imageLinks?.thumbnail}")
+
                 if(bookResponse.items.isNotEmpty()){
                     onSuccess(bookResponse.items.first())
                 } else {

@@ -1,13 +1,24 @@
 package com.example.booktrackerapp.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,9 +30,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.booktrackerapp.R
-import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
+import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.widgets.BookRow
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
@@ -127,7 +138,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
                 // Display the single book result using the SingleBookView composable
                 singlebookState.value?.let {
-                    BookRow(book = it)
+                    BookRow(book = it, navController = navController)
                 }
 
                 // Button with camera icon
