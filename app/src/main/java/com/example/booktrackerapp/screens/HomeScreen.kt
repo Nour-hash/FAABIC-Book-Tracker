@@ -33,7 +33,7 @@ import com.example.booktrackerapp.R
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.viewModel.HomeViewModel
-import com.example.booktrackerapp.widgets.BookRow
+import com.example.booktrackerapp.widgets.BookRowSimple
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -138,7 +138,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
                 // Display the single book result using the SingleBookView composable
                 singlebookState.value?.let {
-                    BookRow(book = it, navController = navController)
+                    BookRowSimple(book = it, navController = navController)
                 }
 
                 // Button with camera icon

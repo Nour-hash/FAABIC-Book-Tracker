@@ -103,6 +103,28 @@ fun BookRow(book: BookItem, navController: NavController) {
 }
 
 @Composable
+fun BookRowSimple(book: BookItem, navController: NavController) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .clickable {
+                // Navigiere zum DetailScreen mit der ISBN des Buches
+                val isbn = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: ""
+                navController.navigate("detail/$isbn")
+            },
+        elevation = CardDefaults.cardElevation(10.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(text = book.volumeInfo.title, style = MaterialTheme.typography.bodyLarge)
+            BookCardHeader(imageUrl = book.volumeInfo.imageLinks?.thumbnail ?: "")
+            Text("Authors: ${book.volumeInfo.authors.joinToString(", ")}", style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+
+@Composable
 fun BookCardHeader(imageUrl: String) {
     Box(
         modifier = Modifier
@@ -155,6 +177,20 @@ fun BookDetails(modifier: Modifier, book: BookItem) {
         Column(modifier = modifier) {
             Text("Authors: ${book.volumeInfo.authors.joinToString(", ")}", style = MaterialTheme.typography.bodySmall)
             Divider(modifier = Modifier.padding(3.dp))
+
+            book.volumeInfo.publisher?.let { Text("Publisher: $it",style = MaterialTheme.typography.bodySmall) }
+            book.volumeInfo.publishedDate?.let { Text("Published Date: $it",style = MaterialTheme.typography.bodySmall) }
+            book.volumeInfo.pageCount?.let { Text("Page Count: $it",style = MaterialTheme.typography.bodySmall) }
+            book.volumeInfo.dimensions?.let {
+                Text("Dimensions: ${it.height} x ${it.width} x ${it.thickness}",style = MaterialTheme.typography.bodySmall)
+            }
+            book.volumeInfo.mainCategory?.let { Text("Main Category: $it",style = MaterialTheme.typography.bodySmall) }
+            book.volumeInfo.averageRating?.let { Text("Rating: $it",style = MaterialTheme.typography.bodySmall) }
+            book.volumeInfo.ratingsCount?.let { Text("Ratings Count: $it",style = MaterialTheme.typography.bodySmall) }
+            book.volumeInfo.retailPrice?.let {
+                Text("Price: ${it.amount} ${it.currencyCode}", style = MaterialTheme.typography.bodySmall)
+            }
+            book.volumeInfo.description?.let { Text("Description: $it",style = MaterialTheme.typography.bodySmall) }
         }
     }
 }
