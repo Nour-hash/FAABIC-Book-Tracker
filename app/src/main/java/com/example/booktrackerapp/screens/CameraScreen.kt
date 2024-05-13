@@ -1,10 +1,9 @@
-package com.example.booktrackerapp.screens
-
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
+import android.os.Environment
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
 import androidx.camera.core.CameraSelector
@@ -12,38 +11,31 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
-import java.util.UUID
-
+import java.util.*
 
 @Composable
-fun CameraScreen(navController: NavController){
+fun CameraScreen(navController: NavController, imageViewModel: ImageViewModel){
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -76,8 +68,17 @@ fun CameraScreen(navController: NavController){
             context = context,
             lifecycleOwner = lifecycleOwner,
             cameraController = cameraController,
+            imageViewModel = imageViewModel,
 
-            onTakePicture = { navController.navigate("previewScreen")
+            onTakePicture = {
+                val mainExecutor = ContextCompat.getMainExecutor(context)
+                cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback(){
+                    override fun onCaptureSuccess(image: ImageProxy) {
+                        val uri = bitmapToUriConverter(image.toBitmap(), context)
+                        imageViewModel.setImageUri(uri)
+                        navController.navigate("previewScreen")
+                    }
+                })
             },
 
             onSwitchCamera = {
@@ -100,6 +101,7 @@ fun CameraScreen(navController: NavController){
     }
 }
 
+
 //ICONS
 @Composable
 fun CameraControls(
@@ -107,7 +109,8 @@ fun CameraControls(
     context: Context,
     lifecycleOwner: LifecycleOwner,
     cameraController: LifecycleCameraController,
-    onTakePicture: (String) -> Unit,
+    imageViewModel: ImageViewModel,
+    onTakePicture: () -> Unit,
     onSwitchCamera: () -> Unit,
     onCancelPreview: () -> Unit,
     onOpenGallery: () -> Unit
@@ -137,13 +140,7 @@ fun CameraControls(
             Spacer(modifier = Modifier.width(8.dp))
 
             IconButton(onClick = {
-                val mainExecutor = ContextCompat.getMainExecutor(context)
-                cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback(){
-                    override fun onCaptureSuccess(image: ImageProxy) {
-                        val uri = bitmapToUriConverter(image.toBitmap(), context)
-                        onTakePicture(uri.toString())
-                    }
-                })
+                onTakePicture()
             }, modifier = Modifier.size(60.dp)) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
@@ -166,12 +163,11 @@ fun CameraControls(
 }
 
 fun bitmapToUriConverter(bitmap: Bitmap, context: Context): Uri {
-    val wrapper = ContextWrapper(context.applicationContext)
-    var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
-    file = File(file, "${UUID.randomUUID()}.jpg")
+    val imagesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    val image = File(imagesDir, "${UUID.randomUUID()}.jpg")
 
     try {
-        val stream: OutputStream = FileOutputStream(file)
+        val stream: OutputStream = FileOutputStream(image)
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
         stream.flush()
         stream.close()
@@ -179,6 +175,6 @@ fun bitmapToUriConverter(bitmap: Bitmap, context: Context): Uri {
         e.printStackTrace()
     }
 
-    return Uri.parse(file.absolutePath)
+    return Uri.fromFile(image)
 }
 

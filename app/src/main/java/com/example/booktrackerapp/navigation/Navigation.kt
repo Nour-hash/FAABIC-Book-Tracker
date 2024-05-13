@@ -1,5 +1,7 @@
 package com.example.booktrackerapp.navigation
 
+import CameraScreen
+import ImageViewModel
 import PreviewScreen
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,12 +15,12 @@ import com.example.booktrackerapp.screens.SignUpScreen
 import com.example.booktrackerapp.screens.SplashScreen
 import com.example.booktrackerapp.screens.Userscreen
 import com.example.booktrackerapp.viewModel.HomeViewModel
-import com.example.booktrackerapp.screens.CameraScreen
 
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
     val viewModel: HomeViewModel = viewModel()
+    val imageViewModel: ImageViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -45,11 +47,11 @@ fun Navigation() {
         }
         composable(Screen.CameraScreen.route)
         {
-            CameraScreen(navController = navController)
+            CameraScreen(navController = navController, imageViewModel = imageViewModel)
         }
         composable(Screen.PreviewScreen.route)
         {
-            PreviewScreen(navController = navController)
+            PreviewScreen(navController = navController, imageViewModel = imageViewModel)
         }
     }
 }
