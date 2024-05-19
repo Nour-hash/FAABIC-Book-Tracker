@@ -17,7 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.booktrackerapp.viewModel.DetailViewModel
-import com.example.booktrackerapp.widgets.BookRow
+import com.example.booktrackerapp.widgets.BookDetails
+import com.example.booktrackerapp.widgets.BookRowSimple
+import com.example.booktrackerapp.widgets.ReadStatusButton
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
 @Composable
@@ -28,6 +30,7 @@ fun DetailScreen(
 ) {
     val bookDetailState = viewModel.bookDetailState
     val errorState = viewModel.errorState
+    val isRead = viewModel.readState.value ?: false  // Abrufen des Lesestatus als lokale Variable
 
     LaunchedEffect(isbn) {
         viewModel.getBookDetails(isbn)
@@ -50,8 +53,11 @@ fun DetailScreen(
                 Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
             } else {
                 bookDetailState.value?.let { book ->
+                    BookRowSimple(book = book, navController = navController, isClickable = false)
                     Spacer(modifier = Modifier.height(8.dp))
-                    BookRow(book = book, navController = navController)
+                    BookDetails(Modifier,book = book)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ReadStatusButton(isRead = isRead, onClick = { viewModel.toggleReadStatus() })
                 }
             }
         }

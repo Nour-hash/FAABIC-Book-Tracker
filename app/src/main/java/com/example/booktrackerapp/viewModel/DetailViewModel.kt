@@ -12,6 +12,7 @@ class DetailViewModel @Inject constructor() : ViewModel() {
 
     val bookDetailState = mutableStateOf<BookItem?>(null)
     val errorState = mutableStateOf<String?>(null)
+    val readState = mutableStateOf<Boolean?>(null)  // Zustand für gelesen/nicht gelesen
 
     fun getBookDetails(isbn: String) {
         viewModelScope.launch {
@@ -21,6 +22,7 @@ class DetailViewModel @Inject constructor() : ViewModel() {
 
                 if (bookResponse.items.isNotEmpty()) {
                     bookDetailState.value = bookResponse.items.first()
+                    readState.value = false // Initialwert für Lesestatus setzen
                 } else {
                     errorState.value = "No book found for this ISBN."
                 }
@@ -29,5 +31,8 @@ class DetailViewModel @Inject constructor() : ViewModel() {
                 errorState.value = "Error fetching book data."
             }
         }
+    }
+    fun toggleReadStatus() {
+        readState.value = readState.value != true
     }
 }

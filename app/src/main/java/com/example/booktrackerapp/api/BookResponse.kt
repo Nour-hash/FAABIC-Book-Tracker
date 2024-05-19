@@ -21,7 +21,8 @@ data class VolumeInfo(
     val ratingsCount: Int?,
     val retailPrice: RetailPrice?,
     val imageLinks: ImageLinks?,
-    val industryIdentifiers: List<IndustryIdentifier>?
+    val industryIdentifiers: List<IndustryIdentifier>?,
+    val categories: List<String>?
     // Weitere relevante Felder hier hinzufügen
 )
 
