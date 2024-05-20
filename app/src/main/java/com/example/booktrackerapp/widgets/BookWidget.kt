@@ -41,6 +41,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.booktrackerapp.api.BookItem
 
+//Darstellung eines Buches mit Titel, Cover,Favoriten-Icon und Author
 @Composable
 fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boolean = true) {
     var isFavorite by remember { mutableStateOf(false) }
@@ -70,7 +71,7 @@ fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boo
     }
 }
 
-
+// zeigt Buchcover und Favoriten-Icon an
 @Composable
 fun BookCardHeader(imageUrl: String, isFavorite: Boolean, onFavoriteClick: () -> Unit) {
     Box(
@@ -115,6 +116,7 @@ fun FavoriteIcon(isFavorite: Boolean, onFavoriteClick: () -> Unit) {
     }
 }
 
+// Detaillierte Ansicht eines Buches
 @Composable
 fun BookDetails(modifier: Modifier, book: BookItem) {
     Card(
@@ -124,7 +126,8 @@ fun BookDetails(modifier: Modifier, book: BookItem) {
             .padding(5.dp),
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
-        LazyColumn(modifier = modifier.padding(horizontal = 16.dp)) {
+        LazyColumn(modifier = modifier.padding(horizontal = 16.dp)
+        ) {
             item {
                 book.volumeInfo.publisher?.let {
                     DetailText(label = "Publisher:", content = it)
@@ -175,6 +178,7 @@ fun DetailText(label: String, content: String) {
     }, style = MaterialTheme.typography.bodyMedium)
 }
 
+// Button zum Anzeigen und Ändern des Lesestatus eines Buches.
 @Composable
 fun ReadStatusButton(isRead: Boolean, onClick: () -> Unit) {
     Button(onClick = onClick) {

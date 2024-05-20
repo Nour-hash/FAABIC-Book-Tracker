@@ -53,17 +53,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    // Entfernt alle Nicht-Ziffern aus der ISBN
     fun normalizeISBN(isbn: String): String {
         return isbn.filter { it.isDigit() }
     }
 
+    // Überprüft, ob eine ISBN gültig ist.
     fun isValidISBN(isbn: String): Boolean {
         return isbn.length == 10 || isbn.length == 13 && isbn.all { it.isDigit() }
     }
+
+    //Sucht nach Büchern mit ISBN
     fun searchBookByISBN(
         rawIsbn: String,
-        //onSuccess: (List<BookItem>) -> Unit,
-        onSuccess: (BookItem) -> Unit,
+        onSuccess: (BookItem) -> Unit, // Callback-Funktion, die bei Erfolg aufgerufen wird.
         onError: (String) -> Unit
     ) {
         val isbn = normalizeISBN(rawIsbn)
@@ -84,6 +87,7 @@ class HomeViewModel @Inject constructor(
                 Log.d("BookSearch", "Book title: ${bookResponse.items.first().volumeInfo.title}")
                 Log.d("BookSearch", "Thumbnail URL: ${bookResponse.items.first().volumeInfo.imageLinks?.thumbnail}")
 
+                // Bei erfolgreicher Suche wird der erste Bucheintrag an den onSuccess Callback übergeben.
                 if(bookResponse.items.isNotEmpty()){
                     onSuccess(bookResponse.items.first())
                 } else {

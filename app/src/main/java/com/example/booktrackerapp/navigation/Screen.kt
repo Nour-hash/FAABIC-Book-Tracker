@@ -10,5 +10,4 @@ sealed class Screen(val route: String) {
     data object SplashScreen : Screen("splashscreen")
     data object CameraScreen : Screen("camerascreen")
 
-
 }

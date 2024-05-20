@@ -17,15 +17,18 @@ import com.example.booktrackerapp.screens.SplashScreen
 import com.example.booktrackerapp.screens.Userscreen
 import com.example.booktrackerapp.viewModel.HomeViewModel
 
+// Verwaltet alle Navigationspfade.
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
     val viewModel: HomeViewModel = viewModel()
 
+    // Definiert den Navigations-Host, der als Kontainer für die Navigationsscreens dient.
     NavHost(
         navController = navController,
         startDestination = Screen.SplashScreen.route
     ) {
+        // Definiert verschiedene Routen und die zugehörigen Composables für die Navigation.
         composable(Screen.HomeScreen.route) {
             HomeScreen(navController = navController,viewModel )
         }
@@ -56,7 +59,7 @@ fun Navigation() {
         ) { backStackEntry ->
             DetailScreen(
                 navController = navController,
-                isbn = backStackEntry.arguments?.getString("isbn") ?: ""
+                isbn = backStackEntry.arguments?.getString("isbn") ?: "" // um die isbn vom backStack zu extrahieren
             )
         }
     }

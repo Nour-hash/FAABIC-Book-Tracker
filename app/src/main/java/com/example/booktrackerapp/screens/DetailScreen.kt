@@ -22,6 +22,7 @@ import com.example.booktrackerapp.widgets.BookRowSimple
 import com.example.booktrackerapp.widgets.ReadStatusButton
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
+//Bildschirm, der Buchdetails anzeigt, basierend auf einer ISBN.
 @Composable
 fun DetailScreen(
     navController: NavController,
