@@ -147,13 +147,8 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
 
                 // Display the single book result using the SingleBookView composable
-                singlebookState.value?.let {
-                    BookRowSimple(book = it, navController = navController)
-                }
-
-                // Display the single book result using the SingleBookView composable
                 if (singlebookState.value != null) {
-                    BookRow(book = singlebookState.value!!)
+                    BookRowSimple(book = singlebookState.value!!, navController = navController)
                 }
 
                 // Button with camera icon
