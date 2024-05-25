@@ -6,6 +6,7 @@ import com.example.booktrackerapp.model.service.AccountService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuthException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -52,4 +53,14 @@ class AccountServiceImpl @Inject constructor() : AccountService {
     override suspend fun deleteAccount() {
         Firebase.auth.currentUser!!.delete().await()
     }
+
+    override suspend fun isUserCredentialsCorrect(email: String, password: String): Boolean {
+        return try {
+            Firebase.auth.signInWithEmailAndPassword(email,password).await()
+            true
+        } catch (e: FirebaseAuthException) {
+            false
+        }
+    }
+
 }

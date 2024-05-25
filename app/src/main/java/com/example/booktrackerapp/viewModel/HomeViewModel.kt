@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
 
     // Überprüft, ob eine ISBN gültig ist.
     fun isValidISBN(isbn: String): Boolean {
-        return isbn.length == 10 || isbn.length == 13 && isbn.all { it.isDigit() }
+        return  isbn.length == 10 || isbn.length == 13 && isbn.all { it.isDigit()  }
     }
 
     //Sucht nach Büchern mit ISBN

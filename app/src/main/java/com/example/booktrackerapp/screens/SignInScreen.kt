@@ -1,5 +1,6 @@
 package com.example.booktrackerapp.screens
 
+import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,23 +22,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.booktrackerapp.R
 import com.example.booktrackerapp.navigation.Screen
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.viewModel.SignInViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hiltViewModel()) {
     val emailState = viewModel.email.collectAsState()
     val passwordState = viewModel.password.collectAsState()
     val passwordVisibilityState = remember { mutableStateOf(false) }
+
+    // State for error messages
+    val emailErrorState = remember { mutableStateOf<String?>(null) }
+    val passwordErrorState = remember { mutableStateOf<String?>(null) }
 
     BookTrackerAppTheme {
         Scaffold() { innerPadding ->
@@ -58,13 +66,27 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                     ) {
                         TextField(
                             value = emailState.value,
-                            onValueChange = { viewModel.updateEmail(it)},
-                            label = { Text("E-Mail") }
+                            onValueChange = {
+                                viewModel.updateEmail(it)
+                                // Validate email
+                                emailErrorState.value = if (it.isValidEmail()) null else "Invalid email"
+                            },
+                            label = { Text("E-Mail") },
+                            isError = emailErrorState.value != null,
+                            singleLine = true
                         )
+                        // Display email error message if present
+                        emailErrorState.value?.let { error ->
+                            Text(text = error, color = Color.Red)
+                        }
 
                         TextField(
                             value = passwordState.value,
-                            onValueChange = { viewModel.updatePassword(it)},
+                            onValueChange = {
+                                viewModel.updatePassword(it)
+                                // Validate password
+                                passwordErrorState.value = if (it.length >= 6) null else "Password must be at least 6 characters long"
+                            },
                             label = { Text("Password") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             visualTransformation = if (passwordVisibilityState.value) VisualTransformation.None else PasswordVisualTransformation(),
@@ -80,21 +102,43 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                                         contentDescription = "Toggle password visibility"
                                     )
                                 }
-
-
-                            }
+                            },
+                            isError = passwordErrorState.value != null,
+                            singleLine = true
                         )
+                        // Display password error message if present
+                        passwordErrorState.value?.let { error ->
+                            Text(text = error, color = Color.Red)
+                        }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Button(onClick = {
-                            /* Handle login */
-
-                                viewModel.onSignInClick(navController)
-                            }) {
+                            // Inside SignInScreen
+                            Button(
+                                onClick = {
+                                    // Validate email and password before signing in
+                                    if (emailState.value.isValidEmail() && passwordState.value.length >= 6) {
+                                        // Check if Credentials are correct
+                                        viewModel.viewModelScope.launch {
+                                            val userExists = viewModel.checkUserCredentials(emailState.value, passwordState.value)
+                                            if (userExists) {
+                                                // Call the ViewModel function
+                                                viewModel.onSignInClick(navController)
+                                            } else {
+                                                // Show error message for wrong credentials
+                                                passwordErrorState.value = "Email or Password wrong. Please check your credentials."
+                                            }
+                                        }
+                                    } else {
+                                        // Show error messages
+                                        emailErrorState.value = if (!emailState.value.isValidEmail()) "Invalid email" else null
+                                        passwordErrorState.value = if (passwordState.value.length < 6) "Password must be at least 6 characters long" else null
+                                    }
+                                }
+                            ) {
                                 Text("Sign in")
                             }
 
@@ -110,4 +154,8 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
             }
         }
     }
+}
+// Extension function to validate email format
+fun String.isValidEmail(): Boolean {
+    return Patterns.EMAIL_ADDRESS.matcher(this).matches()
 }

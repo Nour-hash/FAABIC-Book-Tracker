@@ -54,7 +54,8 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
     val singlebookState = remember { mutableStateOf<BookItem?>(null) }
 
     //Permissions
-    val cameraPermissionState: PermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+    val cameraPermissionState: PermissionState =
+        rememberPermissionState(android.Manifest.permission.CAMERA)
     val hasPermission = cameraPermissionState.status.isGranted
     val onRequestPermission = cameraPermissionState::launchPermissionRequest
 
@@ -91,35 +92,44 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
                         //hier für keyboardActions wurde was gemacht.
                         keyboardActions = KeyboardActions(onDone = {
-                            viewModel.searchBookByISBN(
-                                searchTextState.value,
-                                onSuccess = { books ->
-                                    singlebookState.value = books
-                                    errorState.value = ""
-                                },
-                                onError = { error ->
-                                    errorState.value = error
-                                }
-                            )
+                            if (searchTextState.value.isNotEmpty()) {
+                                viewModel.searchBookByISBN(
+                                    searchTextState.value,
+                                    onSuccess = { books ->
+                                        singlebookState.value = books
+                                        errorState.value = ""
+                                    },
+                                    onError = { error ->
+                                        errorState.value = error
+                                    }
+                                )
+                            } else {
+                                singlebookState.value = null
+                            }
                         })
                     )
+
 
                     // Icon to search
                     IconButton(
                         onClick = {
-                            //TODO
-                            viewModel.searchBookByISBN(
-                                searchTextState.value,
+                            if (searchTextState.value.isNotEmpty()) {
+                                viewModel.searchBookByISBN(
+                                    searchTextState.value,
 
-                                //hier wurde was gemacht.
-                                onSuccess = {books ->
-                                    singlebookState.value = books
-                                    errorState.value = ""
-                                },
-                                onError = { error ->
-                                    errorState.value = error
-                                }
-                            )
+                                    //hier wurde was gemacht.
+                                    onSuccess = { books ->
+                                        singlebookState.value = books
+                                        errorState.value = ""
+                                    },
+                                    onError = { error ->
+                                        errorState.value = error
+                                    }
+                                )
+                            } else {
+                                singlebookState.value = null
+                            }
+
                         }
                     ) {
                         Icon(
@@ -139,6 +149,11 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
                 // Display the single book result using the SingleBookView composable
                 singlebookState.value?.let {
                     BookRowSimple(book = it, navController = navController)
+                }
+
+                // Display the single book result using the SingleBookView composable
+                if (singlebookState.value != null) {
+                    BookRow(book = singlebookState.value!!)
                 }
 
                 // Button with camera icon
