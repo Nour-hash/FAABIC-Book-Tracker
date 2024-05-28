@@ -1,11 +1,14 @@
 package com.example.booktrackerapp.navigation
 
+import PreviewScreen
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.booktrackerapp.model.service.ImageUri
+import com.example.booktrackerapp.screens.CameraScreen
 import androidx.navigation.navArgument
 import com.example.booktrackerapp.screens.CameraScreen
 import com.example.booktrackerapp.screens.DetailScreen
@@ -15,13 +18,17 @@ import com.example.booktrackerapp.screens.SignInScreen
 import com.example.booktrackerapp.screens.SignUpScreen
 import com.example.booktrackerapp.screens.SplashScreen
 import com.example.booktrackerapp.screens.Userscreen
+import com.example.booktrackerapp.viewModel.CameraViewModel
 import com.example.booktrackerapp.viewModel.HomeViewModel
+import com.example.booktrackerapp.screens.CameraScreen
 
 // Verwaltet alle Navigationspfade.
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
     val viewModel: HomeViewModel = viewModel()
+    val cameraViewModel: CameraViewModel = viewModel()
+    val imageUriHolder = ImageUri()
 
     // Definiert den Navigations-Host, der als Kontainer für die Navigationsscreens dient.
     NavHost(
@@ -51,7 +58,11 @@ fun Navigation() {
         }
         composable(Screen.CameraScreen.route)
         {
-            CameraScreen(navController = navController)
+            CameraScreen(navController = navController, cameraViewModel = cameraViewModel, imageUriHolder = imageUriHolder)
+        }
+        composable(Screen.PreviewScreen.route)
+        {
+            PreviewScreen(navController = navController, imageUriHolder = imageUriHolder)
         }
         composable(
             route = Screen.DetailScreen.route + "/{isbn}",
