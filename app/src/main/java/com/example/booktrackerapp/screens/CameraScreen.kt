@@ -1,8 +1,11 @@
 package com.example.booktrackerapp.screens
 
+import android.app.Activity
 import android.graphics.Color
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
@@ -25,6 +28,14 @@ fun CameraScreen(navController: NavController, cameraViewModel: CameraViewModel,
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraController = remember { LifecycleCameraController(context)}
     val lensFacing = remember { mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            cameraViewModel.handleGalleryResult(result.data, imageUriHolder, navController)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -65,7 +76,7 @@ fun CameraScreen(navController: NavController, cameraViewModel: CameraViewModel,
                 navController.navigate("homescreen")
             },
             onOpenGallery = {
-                // TODO
+                cameraViewModel.selectImageFromGallery(galleryLauncher)
             }
         )
     }
