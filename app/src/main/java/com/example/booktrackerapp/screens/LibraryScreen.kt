@@ -11,12 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
+import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
 
 @Composable
-fun LibraryScreen(navController: NavController) {
+fun LibraryScreen(navController: NavController,viewModel: HomeViewModel) {
+    viewModel.initialize(navController)
 
     BookTrackerAppTheme {
         Scaffold(

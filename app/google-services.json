@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "28042505967",
+    "project_id": "book-tracker-c7060",
+    "storage_bucket": "book-tracker-c7060.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28042505967:android:f17c0fd1d384722729b51a",
+        "android_client_info": {
+          "package_name": "com.example.booktrackerapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTCqJPMgmM5VgEQxot7vLeRw8iNOWe5BE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
