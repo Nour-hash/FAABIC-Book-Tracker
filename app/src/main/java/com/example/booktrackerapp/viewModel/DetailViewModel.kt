@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.State
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,7 +19,10 @@ class DetailViewModel @Inject constructor(
 
     val bookDetailState = mutableStateOf<BookItem?>(null)
     val errorState = mutableStateOf<String?>(null)
-    val readState = mutableStateOf<Boolean?>(null)  // Zustand für gelesen/nicht gelesen
+    private val _readState = mutableStateOf(false)// Zustand für gelesen/nicht gelesen
+    val readState: State<Boolean> = _readState
+    private val _favoriteState = mutableStateOf(false)
+    val favoriteState: State<Boolean> = _favoriteState
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -31,7 +35,7 @@ class DetailViewModel @Inject constructor(
 
                 if (bookResponse.items.isNotEmpty()) {
                     bookDetailState.value = bookResponse.items.first()
-                    readState.value = false // Initialwert für Lesestatus setzen
+                    //readState.value = false // Initialwert für Lesestatus setzen
                 } else {
                     errorState.value = "No book found for this ISBN."
                 }
@@ -42,7 +46,7 @@ class DetailViewModel @Inject constructor(
         }
     }
     fun toggleReadStatus() {
-        readState.value = readState.value != true
+        _readState.value = !_readState.value
     }
 
     fun saveBook(libraryId: String, book: BookItem) {
@@ -61,5 +65,7 @@ class DetailViewModel @Inject constructor(
                 e.printStackTrace()
             }
     }
+
+
 }
 

@@ -1,8 +1,6 @@
 package com.example.booktrackerapp.screens
 
-import android.gesture.GestureLibrary
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -20,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.booktrackerapp.viewModel.DetailViewModel
+import com.example.booktrackerapp.viewModel.LibraryViewModel
 import com.example.booktrackerapp.widgets.BookDetails
 import com.example.booktrackerapp.widgets.BookRowSimple
 import com.example.booktrackerapp.widgets.ReadStatusButton
@@ -31,11 +30,14 @@ fun DetailScreen(
     navController: NavController,
     isbn: String,
     libraryId:String,
-    viewModel: DetailViewModel = hiltViewModel()
+    viewModel: DetailViewModel = hiltViewModel(),
+    libraryViewModel: LibraryViewModel = hiltViewModel()
 ) {
     val bookDetailState = viewModel.bookDetailState
     val errorState = viewModel.errorState
     val isRead = viewModel.readState.value ?: false  // Abrufen des Lesestatus als lokale Variable
+    val isFavorite = viewModel.favoriteState.value ?: false  // Assuming you have a favoriteState in viewModel
+
 
     LaunchedEffect(isbn) {
         viewModel.getBookDetails(isbn)
@@ -47,20 +49,30 @@ fun DetailScreen(
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier
+            .padding(innerPadding)
             .fillMaxSize()
-            .padding(innerPadding)){
+            .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally){
             item { if (errorState.value != null) {
                 Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
             } else {
                 bookDetailState.value?.let { book ->
-                    BookRowSimple(book = book, navController = navController, isClickable = false)
+                    BookRowSimple(book = book, navController = navController, isClickable = false,isFavorite)
                     Spacer(modifier = Modifier.height(8.dp))
                     BookDetails(Modifier,book = book)
                     Spacer(modifier = Modifier.height(8.dp))
                     ReadStatusButton(isRead = isRead, onClick = { viewModel.toggleReadStatus() })
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { viewModel.saveBook(libraryId,book) }) {
                         Text("Save Book")
+                    }
+                    Button(onClick = {
+                        book.volumeInfo.industryIdentifiers?.firstOrNull()
+                            ?.let { libraryViewModel.deleteBook(it.identifier) }
+                        navController.popBackStack()  // Navigate back after deletion
+                    }) {
+                        Text("Delete Book")
                     }
                 }
             } }

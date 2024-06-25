@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -22,12 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -46,9 +39,7 @@ import com.example.booktrackerapp.api.BookItem
 
 //Darstellung eines Buches mit Titel, Cover,Favoriten-Icon und Author
 @Composable
-fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boolean = true) {
-    var isFavorite by remember { mutableStateOf(false) }
-
+fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boolean = true, isFavorite: Boolean, onFavoriteClick: () -> Unit ={}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -66,7 +57,7 @@ fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boo
             BookCardHeader(
                 imageUrl = book.volumeInfo.imageLinks?.thumbnail ?: "",
                 isFavorite = isFavorite,
-                onFavoriteClick = { isFavorite = !isFavorite }
+                onFavoriteClick = onFavoriteClick   // Pass the book item to toggleFavorite
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text("Authors: ${book.volumeInfo.authors.joinToString(", ")}", style = MaterialTheme.typography.bodySmall)
@@ -186,28 +177,3 @@ fun ReadStatusButton(isRead: Boolean, onClick: () -> Unit) {
     }
 }
 
-@Composable
-fun NotesInputField(notes: String, onNotesChange: (String) -> Unit) {
-    TextField(
-        value = notes,
-        onValueChange = onNotesChange,
-        label = { Text("Notes") },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-fun PagesReadInputField(pagesRead: Int, onPagesReadChange: (Int) -> Unit) {
-    var pagesReadText by remember { mutableStateOf(pagesRead.toString()) }
-
-    TextField(
-        value = pagesReadText,
-        onValueChange = {
-            pagesReadText = it
-            onPagesReadChange(it.toIntOrNull() ?: 0)
-        },
-        label = { Text("Pages Read") },
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-    )
-}

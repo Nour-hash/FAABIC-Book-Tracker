@@ -1,9 +1,9 @@
 package com.example.booktrackerapp.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,13 +28,14 @@ fun LibraryScreen(navController: NavController, viewModel: LibraryViewModel = hi
 
     val booksState = viewModel.booksState
     val errorState = viewModel.errorState
+    val isFavorite = viewModel.favoriteState.value ?: false
 
     BookTrackerAppTheme {
         Scaffold(
             topBar = { SimpleTopAppBar(navController, title = "Library", backButton = false) },
             bottomBar = { SimpleBottomAppBar(navController) }
         ) { innerPadding ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
@@ -42,13 +43,15 @@ fun LibraryScreen(navController: NavController, viewModel: LibraryViewModel = hi
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (errorState.value != null) {
+                item {
+                    if (errorState.value != null) {
                     Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
                 } else {
                     booksState.value.forEach { book ->
-                        BookRowSimple(book = book, navController = navController, isClickable = false)
+                        BookRowSimple(book = book, navController = navController, isClickable = true,isFavorite) { viewModel.toggleFavorite() }
                     }
-                }
+                } }
+
             }
         }
     }

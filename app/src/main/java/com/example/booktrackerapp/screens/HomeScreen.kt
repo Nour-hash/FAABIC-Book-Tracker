@@ -58,6 +58,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
         rememberPermissionState(android.Manifest.permission.CAMERA)
     val hasPermission = cameraPermissionState.status.isGranted
     val onRequestPermission = cameraPermissionState::launchPermissionRequest
+    val isFavorite = viewModel.favoriteState.value ?: false
 
 
     BookTrackerAppTheme {
@@ -148,7 +149,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
                 // Display the single book result using the SingleBookView composable
                 if (singlebookState.value != null) {
-                    BookRowSimple(book = singlebookState.value!!, navController = navController)
+                    BookRowSimple(book = singlebookState.value!!, isFavorite = isFavorite, navController = navController)
                 }
 
                 // Button with camera icon
