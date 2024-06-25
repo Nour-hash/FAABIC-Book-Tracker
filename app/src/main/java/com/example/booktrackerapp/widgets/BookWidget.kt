@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -21,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -119,16 +122,9 @@ fun FavoriteIcon(isFavorite: Boolean, onFavoriteClick: () -> Unit) {
 // Detaillierte Ansicht eines Buches
 @Composable
 fun BookDetails(modifier: Modifier, book: BookItem) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp)
-            .padding(5.dp),
-        elevation = CardDefaults.cardElevation(10.dp)
-    ) {
-        LazyColumn(modifier = modifier.padding(horizontal = 16.dp)
+    Column(modifier = modifier.padding(horizontal = 16.dp)
         ) {
-            item {
+
                 book.volumeInfo.publisher?.let {
                     DetailText(label = "Publisher:", content = it)
                 }
@@ -164,8 +160,7 @@ fun BookDetails(modifier: Modifier, book: BookItem) {
                     Spacer(modifier = Modifier.height(16.dp)) // Optional: Für Abstand am Ende
                 }
             }
-        }
-    }
+
 }
 
 @Composable
@@ -189,4 +184,30 @@ fun ReadStatusButton(isRead: Boolean, onClick: () -> Unit) {
         )
         Text(text = if (isRead) "Read" else "Marked as not read")
     }
+}
+
+@Composable
+fun NotesInputField(notes: String, onNotesChange: (String) -> Unit) {
+    TextField(
+        value = notes,
+        onValueChange = onNotesChange,
+        label = { Text("Notes") },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun PagesReadInputField(pagesRead: Int, onPagesReadChange: (Int) -> Unit) {
+    var pagesReadText by remember { mutableStateOf(pagesRead.toString()) }
+
+    TextField(
+        value = pagesReadText,
+        onValueChange = {
+            pagesReadText = it
+            onPagesReadChange(it.toIntOrNull() ?: 0)
+        },
+        label = { Text("Pages Read") },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+    )
 }

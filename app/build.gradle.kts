@@ -132,4 +132,6 @@ dependencies {
     //Accompanist Library
     implementation ("com.google.accompanist:accompanist-permissions:0.34.0")
 
+    //Firestore
+    implementation("com.google.firebase:firebase-firestore")
 }

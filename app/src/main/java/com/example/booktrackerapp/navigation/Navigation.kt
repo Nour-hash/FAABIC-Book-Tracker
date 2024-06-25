@@ -21,6 +21,7 @@ import com.example.booktrackerapp.screens.Userscreen
 import com.example.booktrackerapp.viewModel.CameraViewModel
 import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.screens.CameraScreen
+import com.example.booktrackerapp.viewModel.LibraryViewModel
 
 // Verwaltet alle Navigationspfade.
 @Composable
@@ -29,6 +30,8 @@ fun Navigation() {
     val viewModel: HomeViewModel = viewModel()
     val cameraViewModel: CameraViewModel = viewModel()
     val imageUriHolder = ImageUri()
+    val libraryViewModel: LibraryViewModel = viewModel()
+
 
     // Definiert den Navigations-Host, der als Kontainer für die Navigationsscreens dient.
     NavHost(
@@ -40,7 +43,7 @@ fun Navigation() {
             HomeScreen(navController = navController,viewModel )
         }
         composable(Screen.LibraryScreen.route) {
-            LibraryScreen(navController = navController,viewModel)
+            LibraryScreen(navController = navController,viewModel=libraryViewModel)
         }
         composable(Screen.UserScreen.route)
         {
@@ -70,7 +73,8 @@ fun Navigation() {
         ) { backStackEntry ->
             DetailScreen(
                 navController = navController,
-                isbn = backStackEntry.arguments?.getString("isbn") ?: "" // um die isbn vom backStack zu extrahieren
+                isbn = backStackEntry.arguments?.getString("isbn") ?: "", // um die isbn vom backStack zu extrahieren
+                libraryId = "defaultLibrary"
             )
         }
     }

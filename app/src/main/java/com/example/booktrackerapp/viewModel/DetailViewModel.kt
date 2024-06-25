@@ -1,18 +1,27 @@
 package com.example.booktrackerapp.viewModel
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.api.GoogleBooksApiClient
+import com.example.booktrackerapp.model.service.AccountService
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DetailViewModel @Inject constructor() : ViewModel() {
+@HiltViewModel
+class DetailViewModel @Inject constructor(
+    private val accountService: AccountService
+) : BookTrackerViewModel() {
 
     val bookDetailState = mutableStateOf<BookItem?>(null)
     val errorState = mutableStateOf<String?>(null)
     val readState = mutableStateOf<Boolean?>(null)  // Zustand für gelesen/nicht gelesen
+
+    private val db = FirebaseFirestore.getInstance()
+
 
     fun getBookDetails(isbn: String) {
         viewModelScope.launch {
@@ -35,4 +44,22 @@ class DetailViewModel @Inject constructor() : ViewModel() {
     fun toggleReadStatus() {
         readState.value = readState.value != true
     }
+
+    fun saveBook(libraryId: String, book: BookItem) {
+        val bookId = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: return
+        val userId = accountService.currentUserId
+
+        val docRef = db.collection("Users").document(userId)
+            .collection("Libraries").document(libraryId)
+            .collection("Books").document(bookId)
+
+        docRef.set(book, SetOptions.merge())
+            .addOnSuccessListener {
+                // Successfully saved the book
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+            }
+    }
 }
+

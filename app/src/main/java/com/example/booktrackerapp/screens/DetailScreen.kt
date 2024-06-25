@@ -1,11 +1,14 @@
 package com.example.booktrackerapp.screens
 
+import android.gesture.GestureLibrary
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,6 +30,7 @@ import com.example.booktrackerapp.widgets.SimpleTopAppBar
 fun DetailScreen(
     navController: NavController,
     isbn: String,
+    libraryId:String,
     viewModel: DetailViewModel = hiltViewModel()
 ) {
     val bookDetailState = viewModel.bookDetailState
@@ -42,15 +46,10 @@ fun DetailScreen(
             SimpleTopAppBar(navController = navController, title = "Book Details", backButton = true)
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (errorState.value != null) {
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)){
+            item { if (errorState.value != null) {
                 Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
             } else {
                 bookDetailState.value?.let { book ->
@@ -59,8 +58,14 @@ fun DetailScreen(
                     BookDetails(Modifier,book = book)
                     Spacer(modifier = Modifier.height(8.dp))
                     ReadStatusButton(isRead = isRead, onClick = { viewModel.toggleReadStatus() })
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { viewModel.saveBook(libraryId,book) }) {
+                        Text("Save Book")
+                    }
                 }
-            }
+            } }
+
         }
+
     }
 }
