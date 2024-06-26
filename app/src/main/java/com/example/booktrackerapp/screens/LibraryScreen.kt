@@ -21,14 +21,13 @@ import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
 @Composable
-fun LibraryScreen(navController: NavController, viewModel: LibraryViewModel = hiltViewModel()) {
+fun LibraryScreen(navController: NavController, libraryViewModel: LibraryViewModel = hiltViewModel()) {
     LaunchedEffect(Unit) {
-        viewModel.fetchBooks()
+        libraryViewModel.fetchBooks()
     }
 
-    val booksState = viewModel.booksState
-    val errorState = viewModel.errorState
-    val isFavorite = viewModel.favoriteState.value ?: false
+    val booksState = libraryViewModel.booksState
+    val errorState = libraryViewModel.errorState
 
     BookTrackerAppTheme {
         Scaffold(
@@ -48,7 +47,13 @@ fun LibraryScreen(navController: NavController, viewModel: LibraryViewModel = hi
                     Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
                 } else {
                     booksState.value.forEach { book ->
-                        BookRowSimple(book = book, navController = navController, isClickable = true,isFavorite) { viewModel.toggleFavorite() }
+                        BookRowSimple(
+                            book = book,
+                            navController = navController,
+                            isClickable = true
+                        ) { bookId, isFavorite ->
+                            libraryViewModel.updateFavoriteStatus(bookId, isFavorite)
+                        }
                     }
                 } }
 

@@ -36,7 +36,6 @@ fun DetailScreen(
     val bookDetailState = viewModel.bookDetailState
     val errorState = viewModel.errorState
     val isRead = viewModel.readState.value ?: false  // Abrufen des Lesestatus als lokale Variable
-    val isFavorite = viewModel.favoriteState.value ?: false  // Assuming you have a favoriteState in viewModel
 
 
     LaunchedEffect(isbn) {
@@ -58,7 +57,13 @@ fun DetailScreen(
                 Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
             } else {
                 bookDetailState.value?.let { book ->
-                    BookRowSimple(book = book, navController = navController, isClickable = false,isFavorite)
+                    BookRowSimple(
+                        book = book,
+                        navController = navController,
+                        isClickable = false
+                    ) { bookId, isFavorite ->
+                        libraryViewModel.updateFavoriteStatus(bookId, isFavorite)
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     BookDetails(Modifier,book = book)
                     Spacer(modifier = Modifier.height(8.dp))

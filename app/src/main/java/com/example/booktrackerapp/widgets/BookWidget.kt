@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -22,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,16 +36,39 @@ import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.booktrackerapp.api.BookItem
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 //Darstellung eines Buches mit Titel, Cover,Favoriten-Icon und Author
 @Composable
-fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boolean = true, isFavorite: Boolean, onFavoriteClick: () -> Unit ={}) {
+fun BookRowSimple(
+    book: BookItem,
+    navController: NavController,
+    isClickable: Boolean = true,
+    onFavoriteClick: (String, Boolean) -> Unit
+) {
+    val favoriteState = produceState(initialValue = book.volumeInfo.isFavorite ?: false) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val libraryId = "defaultLibrary"
+        val bookId = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: ""
+        val db = FirebaseFirestore.getInstance()
+
+        val docRef = db.collection("Users").document(userId!!)
+            .collection("Libraries").document(libraryId)
+            .collection("Books").document(bookId)
+
+        docRef.addSnapshotListener { snapshot, _ ->
+            if (snapshot != null && snapshot.exists()) {
+                value = snapshot.getBoolean("volumeInfo.isFavorite") ?: false
+            }
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
             .then(if (isClickable) Modifier.clickable {
-                // Navigiere zum DetailScreen mit der ISBN des Buches
                 val isbn = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: ""
                 navController.navigate("detail/$isbn")
             } else Modifier),
@@ -56,8 +79,8 @@ fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boo
             Spacer(modifier = Modifier.height(8.dp))
             BookCardHeader(
                 imageUrl = book.volumeInfo.imageLinks?.thumbnail ?: "",
-                isFavorite = isFavorite,
-                onFavoriteClick = onFavoriteClick   // Pass the book item to toggleFavorite
+                isFavorite = favoriteState.value,
+                onFavoriteClick = { onFavoriteClick(book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: "", !favoriteState.value) }
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text("Authors: ${book.volumeInfo.authors.joinToString(", ")}", style = MaterialTheme.typography.bodySmall)
@@ -65,7 +88,6 @@ fun BookRowSimple(book: BookItem, navController: NavController, isClickable: Boo
     }
 }
 
-// zeigt Buchcover und Favoriten-Icon an
 @Composable
 fun BookCardHeader(imageUrl: String, isFavorite: Boolean, onFavoriteClick: () -> Unit) {
     Box(
@@ -100,7 +122,7 @@ fun FavoriteIcon(isFavorite: Boolean, onFavoriteClick: () -> Unit) {
             .fillMaxSize()
             .padding(10.dp),
         contentAlignment = Alignment.TopEnd
-    ){
+    ) {
         Icon(
             modifier = Modifier.clickable(onClick = onFavoriteClick),
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
@@ -109,6 +131,7 @@ fun FavoriteIcon(isFavorite: Boolean, onFavoriteClick: () -> Unit) {
         )
     }
 }
+
 
 // Detaillierte Ansicht eines Buches
 @Composable

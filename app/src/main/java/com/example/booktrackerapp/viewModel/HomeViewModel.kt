@@ -2,8 +2,6 @@ package com.example.booktrackerapp.viewModel
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.booktrackerapp.api.BookItem
@@ -17,12 +15,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val accountService: AccountService):BookTrackerViewModel() {
-    private val _favoriteState = mutableStateOf(false)
-    val favoriteState: State<Boolean> = _favoriteState
-
-    fun toggleFavorite() {
-        _favoriteState.value = !_favoriteState.value
-    }
 
     fun onSignOutClick() {
         launchCatching {

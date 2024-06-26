@@ -1,6 +1,5 @@
 package com.example.booktrackerapp.viewModel
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.booktrackerapp.api.BookItem
@@ -16,8 +15,7 @@ class LibraryViewModel @Inject constructor(
 
     val booksState = mutableStateOf<List<BookItem>>(emptyList())
     val errorState = mutableStateOf<String?>(null)
-    private val _favoriteState = mutableStateOf(false)
-    val favoriteState: State<Boolean> = _favoriteState
+
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -38,9 +36,24 @@ class LibraryViewModel @Inject constructor(
                 errorState.value = "Error fetching books."
             }
     }
-    fun toggleFavorite() {
-        _favoriteState.value = !_favoriteState.value
+
+    fun updateFavoriteStatus(bookId: String, isFavorite: Boolean) {
+        val userId = accountService.currentUserId
+        val libraryId = "defaultLibrary"
+
+        db.collection("Users").document(userId)
+            .collection("Libraries").document(libraryId)
+            .collection("Books").document(bookId)
+            .update("volumeInfo.isFavorite", isFavorite)  // Correct field path
+            .addOnSuccessListener {
+                fetchBooks()
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+                errorState.value = "Error updating favorite status."
+            }
     }
+
 
     // New method to delete a book
     fun deleteBook(bookId: String) {

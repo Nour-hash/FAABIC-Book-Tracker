@@ -21,8 +21,7 @@ class DetailViewModel @Inject constructor(
     val errorState = mutableStateOf<String?>(null)
     private val _readState = mutableStateOf(false)// Zustand für gelesen/nicht gelesen
     val readState: State<Boolean> = _readState
-    private val _favoriteState = mutableStateOf(false)
-    val favoriteState: State<Boolean> = _favoriteState
+
 
     private val db = FirebaseFirestore.getInstance()
 
