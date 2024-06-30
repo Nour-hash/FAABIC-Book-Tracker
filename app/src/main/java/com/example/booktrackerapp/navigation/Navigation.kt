@@ -40,6 +40,12 @@ fun Navigation() {
         composable(Screen.HomeScreen.route) {
             HomeScreen(navController = navController,viewModel )
         }
+        composable(Screen.HomeScreen.route + "/{isbn}",
+            arguments = listOf(navArgument("isbn") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val isbn = backStackEntry.arguments?.getString("isbn")
+            HomeScreen(navController = navController, viewModel = viewModel, isbn = isbn)
+        }
         composable(Screen.LibraryScreen.route) {
             LibraryScreen(navController = navController,libraryViewModel=libraryViewModel)
         }

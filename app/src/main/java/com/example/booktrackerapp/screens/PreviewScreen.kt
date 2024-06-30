@@ -55,6 +55,12 @@ fun PreviewScreen(navController: NavController, imageUriHolder: ImageUri) {
                 bitmapUri?.let { uri ->
                     val filePath = File(uri.path!!).absolutePath
                     // call isbn.py script
+                    val extractedIsbn = "9781529113594" // Replace with your logic
+
+                    if (extractedIsbn.isNotEmpty()) {
+                        // Navigate back to HomeScreen with the extracted ISBN
+                        navController.navigate("homeScreen/$extractedIsbn")
+                    }
                 }
             }) {
                 Text("Done")
