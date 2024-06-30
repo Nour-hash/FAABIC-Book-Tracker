@@ -1,54 +1,78 @@
 package com.example.booktrackerapp.api
 
-//enthält die Gesamtantwort der API, besteht aus einzelnen Büchern(BookItem)
+// Represents the overall response from the API, consisting of individual books (BookItem)
 data class BookResponse(
     val items: List<BookItem>
-)
+) {
+    // Default no-argument constructor required by Firestore
+    constructor() : this(emptyList())
+}
 
-//Repräsentiert ein einzelnes Buch
+// Represents a single book
 data class BookItem(
     val volumeInfo: VolumeInfo
-)
+) {
+    // Default no-argument constructor required by Firestore
+    constructor() : this(VolumeInfo())
+}
 
-// Detaillierte Informationen über ein Buch.
+// Detailed information about a book
 data class VolumeInfo(
-    val title: String,
-    val authors: List<String>,
-    val publisher: String?,
-    val publishedDate: String?,
-    val description: String?,
-    val pageCount: Int?,
-    val dimensions: Dimensions?,
-    val mainCategory: String?,
-    val averageRating: Double?,
-    val ratingsCount: Int?,
-    val retailPrice: RetailPrice?,
-    val imageLinks: ImageLinks?,
-    val industryIdentifiers: List<IndustryIdentifier>?,
-    val categories: List<String>?
-    // Weitere relevante Felder hier hinzufügen
-)
+    val title: String = "",
+    val authors: List<String> = emptyList(),
+    val publisher: String? = null,
+    val publishedDate: String? = null,
+    val description: String? = null,
+    val pageCount: Int? = null,
+    val dimensions: Dimensions? = null,
+    val mainCategory: String? = null,
+    val averageRating: Double? = null,
+    val ratingsCount: Int? = null,
+    val retailPrice: RetailPrice? = null,
+    val imageLinks: ImageLinks? = null,
+    val industryIdentifiers: List<IndustryIdentifier>? = null,
+    val categories: List<String>? = null,
+    val notes: String? = null,  // Personal notes about the book
+    val isRead: Boolean? = false,  // Reading status
+    val pagesRead: Int? = 0,  // Number of pages read
+    val isFavorite: Boolean? = false  // Favorite status
+) {
+    // Default no-argument constructor required by Firestore
+    constructor() : this("", emptyList())
+}
 
-//URL-Links zu den Buchcover-Bildern.
+// URL links to book cover images
 data class ImageLinks(
-    val thumbnail: String
-)
+    val thumbnail: String = ""
+) {
+    // Default no-argument constructor required by Firestore
+    constructor() : this("")
+}
 
-// Identifikato für ISBN, welches verwendet wird, um ein Buch eindeutig zu identifizieren.
+// Identifier for ISBN used to uniquely identify a book
 data class IndustryIdentifier(
-    val type: String, // Art des Identifikators, z.B. ISBN_10 oder ISBN_13.
-    val identifier: String // Der Identifikatorwert z.B bei ISBN_10 (3257602642)
-)
+    val type: String = "",
+    val identifier: String = ""
+) {
+    // Default no-argument constructor required by Firestore
+    constructor() : this("", "")
+}
 
-// Abmessungen des physischen Buches.
+// Dimensions of the physical book
 data class Dimensions(
-    val height: String,
-    val width: String,
-    val thickness: String
-)
+    val height: String = "",
+    val width: String = "",
+    val thickness: String = ""
+) {
+    // Default no-argument constructor required by Firestore
+    constructor() : this("", "", "")
+}
 
-// Einzelhandelspreis des Buches
+// Retail price of the book
 data class RetailPrice(
-    val amount: Double,
-    val currencyCode: String
-)
+    val amount: Double = 0.0,
+    val currencyCode: String = ""
+) {
+    // Default no-argument constructor required by Firestore
+    constructor() : this(0.0, "")
+}

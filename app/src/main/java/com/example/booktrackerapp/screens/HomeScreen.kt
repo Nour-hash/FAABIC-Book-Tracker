@@ -28,11 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.booktrackerapp.R
 import com.example.booktrackerapp.api.BookItem
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.viewModel.HomeViewModel
+import com.example.booktrackerapp.viewModel.LibraryViewModel
 import com.example.booktrackerapp.widgets.BookRowSimple
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
@@ -44,7 +46,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
+fun HomeScreen(navController: NavController,viewModel: HomeViewModel, libraryViewModel: LibraryViewModel = hiltViewModel()) {
 
     viewModel.initialize(navController)
 
@@ -148,8 +150,11 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel) {
 
                 // Display the single book result using the SingleBookView composable
                 if (singlebookState.value != null) {
-                    BookRowSimple(book = singlebookState.value!!, navController = navController)
+                    BookRowSimple(book = singlebookState.value!!,navController = navController, isClickable = true) { bookId, isFavorite ->
+                        libraryViewModel.updateFavoriteStatus(bookId, isFavorite)
+                    }
                 }
+
 
                 // Button with camera icon
                 FloatingActionButton(
