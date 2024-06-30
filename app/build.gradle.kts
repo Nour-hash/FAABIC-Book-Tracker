@@ -60,6 +60,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
     // Version variables for consistency
     val lifecycleVersion = "2.7.0"
     val navigationVersion = "2.7.7"

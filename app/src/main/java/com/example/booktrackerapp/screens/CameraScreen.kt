@@ -9,12 +9,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.booktrackerapp.model.service.ImageUri
@@ -22,11 +27,10 @@ import com.example.booktrackerapp.viewModel.CameraViewModel
 import com.example.booktrackerapp.widgets.CameraControls
 
 @Composable
-fun CameraScreen(navController: NavController, cameraViewModel: CameraViewModel, imageUriHolder: ImageUri){
-
+fun CameraScreen(navController: NavController, cameraViewModel: CameraViewModel, imageUriHolder: ImageUri) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraController = remember { LifecycleCameraController(context)}
+    val cameraController = remember { LifecycleCameraController(context) }
     val lensFacing = remember { mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -40,25 +44,36 @@ fun CameraScreen(navController: NavController, cameraViewModel: CameraViewModel,
     Box(
         modifier = Modifier
             .fillMaxSize()
-    ){
+    ) {
 
-        //Camera Preview
+        // Camera Preview
         AndroidView(
-            modifier = Modifier,
+            modifier = Modifier.fillMaxSize(),
             factory = { context ->
-                PreviewView(context).apply{
+                PreviewView(context).apply {
                     layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
                     setBackgroundColor(Color.BLACK)
                     scaleType = PreviewView.ScaleType.FILL_START
-                }.also {previewView ->
+                }.also { previewView ->
                     previewView.controller = cameraController
                     cameraController.bindToLifecycle(lifecycleOwner)
                 }
-            })
-        //Camera Button-Funktionen
+            }
+        )
+
+
+        // Overlay with border
+        Box(
+            modifier = Modifier
+                .width(350.dp)
+                .height(80.dp)// Add padding to adjust the frame size as needed
+                .border(4.dp, White)  // Set border thickness and color
+                .align(Alignment.Center)  // Center the frame
+        )
+
+        // Camera Button Functions
         CameraControls(
             modifier = Modifier.align(Alignment.BottomCenter),
-
             onTakePicture = {
                 cameraViewModel.takePicture(
                     cameraController = cameraController,
@@ -70,7 +85,8 @@ fun CameraScreen(navController: NavController, cameraViewModel: CameraViewModel,
             onSwitchCamera = {
                 cameraViewModel.switchCamera(
                     lensFacing = lensFacing,
-                    cameraController = cameraController)
+                    cameraController = cameraController
+                )
             },
             onCancelPreview = {
                 navController.navigate("homescreen")
@@ -81,7 +97,3 @@ fun CameraScreen(navController: NavController, cameraViewModel: CameraViewModel,
         )
     }
 }
-
-
-
-

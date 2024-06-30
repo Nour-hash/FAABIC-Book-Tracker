@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.booktrackerapp.model.service.ImageUri
+import java.io.File
 
 @Composable
 fun PreviewScreen(navController: NavController, imageUriHolder: ImageUri) {
@@ -50,7 +51,12 @@ fun PreviewScreen(navController: NavController, imageUriHolder: ImageUri) {
                 Text("Retake")
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = {}) {
+            Button(onClick = {
+                bitmapUri?.let { uri ->
+                    val filePath = File(uri.path!!).absolutePath
+                    // call isbn.py script
+                }
+            }) {
                 Text("Done")
             }
         }
