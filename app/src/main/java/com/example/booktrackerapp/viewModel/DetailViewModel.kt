@@ -33,8 +33,27 @@ class DetailViewModel @Inject constructor(
                 val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
 
                 if (bookResponse.items.isNotEmpty()) {
-                    bookDetailState.value = bookResponse.items.first()
-                    //readState.value = false // Initialwert für Lesestatus setzen
+                    val book = bookResponse.items.first()
+                    bookDetailState.value = book
+
+                    // Fetch the read status from Firestore
+                    val bookId = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: return@launch
+                    val userId = accountService.currentUserId
+                    val libraryId = "defaultLibrary"
+
+                    val docRef = db.collection("Users").document(userId)
+                        .collection("Libraries").document(libraryId)
+                        .collection("Books").document(bookId)
+
+                    docRef.get().addOnSuccessListener { document ->
+                        if (document.exists()) {
+                            val isRead = document.getBoolean("volumeInfo.isRead") ?: false
+                            _readState.value = isRead
+                        }
+                    }.addOnFailureListener { e ->
+                        e.printStackTrace()
+                        errorState.value = "Error fetching read status."
+                    }
                 } else {
                     errorState.value = "No book found for this ISBN."
                 }
@@ -44,8 +63,10 @@ class DetailViewModel @Inject constructor(
             }
         }
     }
-    fun toggleReadStatus() {
-        _readState.value = !_readState.value
+    fun toggleReadStatus(bookId: String) {
+        val newStatus = !_readState.value
+        _readState.value = newStatus
+        updateReadStatus(bookId, newStatus)
     }
 
     fun saveBook(libraryId: String, book: BookItem) {
@@ -62,6 +83,24 @@ class DetailViewModel @Inject constructor(
             }
             .addOnFailureListener { e ->
                 e.printStackTrace()
+            }
+    }
+
+    //Method to update is read
+    fun updateReadStatus(bookId: String, isRead: Boolean) {
+        val userId = accountService.currentUserId
+        val libraryId = "defaultLibrary"
+
+        db.collection("Users").document(userId)
+            .collection("Libraries").document(libraryId)
+            .collection("Books").document(bookId)
+            .update("volumeInfo.isRead", isRead)  // Feldpfad anpassen
+            .addOnSuccessListener {
+                  _readState.value = isRead
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+                errorState.value = "Error updating read status."
             }
     }
 

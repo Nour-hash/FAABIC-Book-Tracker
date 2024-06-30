@@ -67,7 +67,9 @@ fun DetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     BookDetails(Modifier,book = book)
                     Spacer(modifier = Modifier.height(8.dp))
-                    ReadStatusButton(isRead = isRead, onClick = { viewModel.toggleReadStatus() })
+                    ReadStatusButton(isRead = isRead){
+                        viewModel.toggleReadStatus(book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: "")
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { viewModel.saveBook(libraryId,book) }) {
                         Text("Save Book")
