@@ -15,7 +15,8 @@ class LibraryViewModel @Inject constructor(
 
     val booksState = mutableStateOf<List<BookItem>>(emptyList())
     val errorState = mutableStateOf<String?>(null)
-
+    val sortState = mutableStateOf<SortOrder>(SortOrder.None)
+    val filterState = mutableStateOf(FilterCriteria())
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -28,7 +29,9 @@ class LibraryViewModel @Inject constructor(
             .collection("Books")
             .get()
             .addOnSuccessListener { result ->
-                val books = result.toObjects(BookItem::class.java)
+                var books = result.toObjects(BookItem::class.java)
+                books = applyFilters(books)
+                books = applySorting(books)
                 booksState.value = books
             }
             .addOnFailureListener { e ->
@@ -44,7 +47,7 @@ class LibraryViewModel @Inject constructor(
         db.collection("Users").document(userId)
             .collection("Libraries").document(libraryId)
             .collection("Books").document(bookId)
-            .update("volumeInfo.isFavorite", isFavorite)  // Correct field path
+            .update("volumeInfo.isFavorite", isFavorite)
             .addOnSuccessListener {
                 fetchBooks()
             }
@@ -54,8 +57,6 @@ class LibraryViewModel @Inject constructor(
             }
     }
 
-
-    // New method to delete a book
     fun deleteBook(bookId: String) {
         val userId = accountService.currentUserId
         val libraryId = "defaultLibrary"
@@ -65,12 +66,61 @@ class LibraryViewModel @Inject constructor(
             .collection("Books").document(bookId)
             .delete()
             .addOnSuccessListener {
-                // Remove the deleted book from the local state
-                booksState.value = booksState.value.filter { it.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier!= bookId }
+                booksState.value = booksState.value.filter { it.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier != bookId }
             }
             .addOnFailureListener { e ->
                 e.printStackTrace()
                 errorState.value = "Error deleting book."
             }
+    }
+
+    fun sortBooksAscending() {
+        sortState.value = SortOrder.Ascending
+        booksState.value = booksState.value.sortedBy { it.volumeInfo.title }
+    }
+
+    fun sortBooksDescending() {
+        sortState.value = SortOrder.Descending
+        booksState.value = booksState.value.sortedByDescending { it.volumeInfo.title }
+    }
+
+    fun applySorting(books: List<BookItem>): List<BookItem> {
+        return when (sortState.value) {
+            SortOrder.Ascending -> books.sortedBy { it.volumeInfo.title }
+            SortOrder.Descending -> books.sortedByDescending { it.volumeInfo.title }
+            else -> books
+        }
+    }
+
+    fun applyFilters(books: List<BookItem>): List<BookItem> {
+        return books.filter { book ->
+            val matchesName = filterState.value.name?.let { book.volumeInfo.title.contains(it, ignoreCase = true) } ?: true
+            val matchesGenre = filterState.value.genre?.let { genre ->
+                book.volumeInfo.categories?.any { it.contains(genre, ignoreCase = true) } ?: false
+            } ?: true
+            val matchesReadStatus = filterState.value.readStatus?.let { book.volumeInfo.isRead == it } ?: true
+            val matchesAuthor = filterState.value.author?.let { author ->
+                book.volumeInfo.authors?.any { it.contains(author, ignoreCase = true) } ?: false
+            } ?: true
+
+            matchesName && matchesGenre && matchesReadStatus && matchesAuthor
+        }
+    }
+
+    fun setFilterCriteria(name: String? = null, genre: String? = null, readStatus: Boolean? = null, author: String? = null) {
+        filterState.value = FilterCriteria(name, genre, readStatus, author)
+        fetchBooks()
+    }
+
+
+    data class FilterCriteria(
+        val name: String? = null,
+        val genre: String? = null,
+        val readStatus: Boolean? = null,
+        val author: String? = null
+    )
+
+    enum class SortOrder {
+        None, Ascending, Descending
     }
 }
