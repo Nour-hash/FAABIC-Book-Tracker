@@ -16,7 +16,7 @@ class LibraryViewModel @Inject constructor(
     val booksState = mutableStateOf<List<BookItem>>(emptyList())
     val errorState = mutableStateOf<String?>(null)
     val sortState = mutableStateOf<SortOrder>(SortOrder.None)
-    val filterState = mutableStateOf(FilterCriteria())
+    private val filterState = mutableStateOf(FilterCriteria())
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -100,12 +100,13 @@ class LibraryViewModel @Inject constructor(
             } ?: true
             val matchesReadStatus = filterState.value.readStatus?.let { book.volumeInfo.isRead == it } ?: true
             val matchesAuthor = filterState.value.author?.let { author ->
-                book.volumeInfo.authors?.any { it.contains(author, ignoreCase = true) } ?: false
+                book.volumeInfo.authors?.any { it.contains(author, ignoreCase = true) } ?: true
             } ?: true
 
             matchesName && matchesGenre && matchesReadStatus && matchesAuthor
         }
     }
+
 
     fun setFilterCriteria(name: String? = null, genre: String? = null, readStatus: Boolean? = null, author: String? = null) {
         filterState.value = FilterCriteria(name, genre, readStatus, author)

@@ -26,7 +26,10 @@ fun LibraryScreen(navController: NavController, libraryViewModel: LibraryViewMod
     var filterReadStatus by rememberSaveable { mutableStateOf<Boolean?>(null) }
     var filterAuthor by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(sortOrder, filterName, filterGenre, filterReadStatus, filterAuthor) {
+    var selectedGenre by rememberSaveable { mutableStateOf("") }
+
+
+    LaunchedEffect(sortOrder, filterName, filterGenre, filterReadStatus, filterAuthor,selectedGenre) {
         libraryViewModel.setFilterCriteria(filterName, filterGenre, filterReadStatus, filterAuthor)
         libraryViewModel.sortState.value = sortOrder
         libraryViewModel.fetchBooks()
