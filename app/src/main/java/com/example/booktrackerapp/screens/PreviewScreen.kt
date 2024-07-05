@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.booktrackerapp.ai.extractISBNFromBitmap
 import com.example.booktrackerapp.model.service.ImageUri
 import java.io.File
 
@@ -53,13 +54,12 @@ fun PreviewScreen(navController: NavController, imageUriHolder: ImageUri) {
             Spacer(modifier = Modifier.width(16.dp))
             Button(onClick = {
                 bitmapUri?.let { uri ->
-                    val filePath = File(uri.path!!).absolutePath
-                    // call isbn.py script
-                    val extractedIsbn = "9781529113594" // Replace with your logic
-
-                    if (extractedIsbn.isNotEmpty()) {
-                        // Navigate back to HomeScreen with the extracted ISBN
-                        navController.navigate("homeScreen/$extractedIsbn")
+                    val bitmap = loadBitmapFromUri(uri, context)
+                    extractISBNFromBitmap(context, bitmap) { extractedIsbn ->
+                        if (!extractedIsbn.isNullOrEmpty()) {
+                            // Navigate back to HomeScreen with the extracted ISBN
+                            navController.navigate("homeScreen/$extractedIsbn")
+                        }
                     }
                 }
             }) {

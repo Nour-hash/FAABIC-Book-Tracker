@@ -31,7 +31,7 @@ class CameraViewModel: ViewModel() {
         context: Context,
         cameraController: LifecycleCameraController,
         imageUriHolder: ImageUri,
-        navController: NavController
+        navController: NavController,
     ) {
         val mainExecutor = ContextCompat.getMainExecutor(context)
         cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback() {

@@ -48,6 +48,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        mlModelBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
@@ -62,6 +63,9 @@ android {
 dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
     implementation("com.google.android.gms:play-services-drive:17.0.0")
+    implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
+    implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.3.0")
     // Version variables for consistency
     val lifecycleVersion = "2.7.0"
     val navigationVersion = "2.7.7"
@@ -136,4 +140,8 @@ dependencies {
 
     //Firestore
     implementation("com.google.firebase:firebase-firestore")
+
+    //Google ML kit
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+
 }

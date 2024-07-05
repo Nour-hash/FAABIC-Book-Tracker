@@ -97,7 +97,7 @@ class LibraryViewModel @Inject constructor(
             val matchesName = filterState.value.name?.let { book.volumeInfo.title.contains(it, ignoreCase = true) } ?: true
             val matchesGenre = filterState.value.genre?.let { genre ->
                 book.volumeInfo.categories?.any { it.contains(genre, ignoreCase = true) } ?: false
-            } ?: true
+            } ?: true || book.volumeInfo.categories == null
             val matchesReadStatus = filterState.value.readStatus?.let { book.volumeInfo.isRead == it } ?: true
             val matchesAuthor = filterState.value.author?.let { author ->
                 book.volumeInfo.authors?.any { it.contains(author, ignoreCase = true) } ?: true

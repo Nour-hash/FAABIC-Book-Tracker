@@ -10,13 +10,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.booktrackerapp.model.service.ImageUri
 import com.example.booktrackerapp.screens.CameraScreen
 import androidx.navigation.navArgument
+import com.example.booktrackerapp.screens.CameraScreenFront
 import com.example.booktrackerapp.screens.DetailScreen
 import com.example.booktrackerapp.screens.HomeScreen
 import com.example.booktrackerapp.screens.LibraryScreen
+import com.example.booktrackerapp.screens.PreviewScreenFront
 import com.example.booktrackerapp.screens.SignInScreen
 import com.example.booktrackerapp.screens.SignUpScreen
 import com.example.booktrackerapp.screens.SplashScreen
 import com.example.booktrackerapp.screens.Userscreen
+import com.example.booktrackerapp.viewModel.CameraFrontViewModel
 import com.example.booktrackerapp.viewModel.CameraViewModel
 import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.viewModel.LibraryViewModel
@@ -27,6 +30,7 @@ fun Navigation() {
     val navController = rememberNavController()
     val viewModel: HomeViewModel = viewModel()
     val cameraViewModel: CameraViewModel = viewModel()
+    val cameraFrontViewModel: CameraFrontViewModel = viewModel()
     val imageUriHolder = ImageUri()
     val libraryViewModel: LibraryViewModel = viewModel()
 
@@ -67,9 +71,18 @@ fun Navigation() {
         {
             CameraScreen(navController = navController, cameraViewModel = cameraViewModel, imageUriHolder = imageUriHolder)
         }
+        composable(Screen.CameraScreenFront.route)
+        {
+            CameraScreenFront(navController = navController, cameraViewModel = cameraFrontViewModel, imageUriHolder = imageUriHolder)
+        }
+
         composable(Screen.PreviewScreen.route)
         {
             PreviewScreen(navController = navController, imageUriHolder = imageUriHolder)
+        }
+        composable(Screen.PreviewScreenFront.route)
+        {
+            PreviewScreenFront(navController = navController, imageUriHolder = imageUriHolder)
         }
         composable(
             route = Screen.DetailScreen.route + "/{isbn}",

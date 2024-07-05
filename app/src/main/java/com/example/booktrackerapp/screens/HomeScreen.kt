@@ -176,7 +176,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel, libraryVie
                     onClick = {
                         //Zu CameraScreen wechseln, wenn Permission erteilt wurde
                         if (hasPermission) {
-                            navController.navigate("camerascreen")
+                            navController.navigate("camerascreenfront")
                         } else {
                             onRequestPermission()
                         }
