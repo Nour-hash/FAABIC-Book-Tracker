@@ -35,7 +35,8 @@ data class VolumeInfo(
     val notes: String? = null,  // Personal notes about the book
     val isRead: Boolean? = false,  // Reading status
     val pagesRead: Int? = 0,  // Number of pages read
-    val isFavorite: Boolean? = false  // Favorite status
+    val isFavorite: Boolean? = false,  // Favorite status
+    val userRating: Int? = null
 ) {
     // Default no-argument constructor required by Firestore
     constructor() : this("", emptyList())

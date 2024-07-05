@@ -55,26 +55,6 @@ class LibraryViewModel @Inject constructor(
     }
 
 
-    // New method to delete a book
-    fun deleteBook(bookId: String) {
-        val userId = accountService.currentUserId
-        val libraryId = "defaultLibrary"
-
-        db.collection("Users").document(userId)
-            .collection("Libraries").document(libraryId)
-            .collection("Books").document(bookId)
-            .delete()
-            .addOnSuccessListener {
-                // Remove the deleted book from the local state
-                booksState.value = booksState.value.filter { it.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier!= bookId }
-            }
-            .addOnFailureListener { e ->
-                e.printStackTrace()
-                errorState.value = "Error deleting book."
-            }
-    }
-
-
 
 
 
