@@ -70,10 +70,6 @@ fun Userscreen(navController: NavController,viewModel: HomeViewModel) {
                         .padding(8.dp)
                 )
 
-//TODO username
-                // Label for username
-                Text(text = "Username: Nour", modifier = Modifier.padding(vertical = 8.dp))
-
                 // Label for email
                 Text(text = "Email: ${userEmail}", modifier = Modifier.padding(vertical = 8.dp))
 
