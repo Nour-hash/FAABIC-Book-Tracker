@@ -1,6 +1,5 @@
 package com.example.booktrackerapp.viewModel
 
-import android.net.Uri
 import android.util.Log
 import com.example.booktrackerapp.BuildConfig
 import androidx.lifecycle.viewModelScope
@@ -13,35 +12,52 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for the Home screen.
+ *
+ * @param accountService The service for accessing user account information.
+ */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val accountService: AccountService):BookTrackerViewModel() {
+    private val accountService: AccountService
+) : BookTrackerViewModel() {
 
+    /**
+     * Handles sign-out button click.
+     */
     fun onSignOutClick() {
         launchCatching {
             accountService.signOut()
         }
     }
 
+    /**
+     * Handles delete account button click.
+     */
     fun onDeleteAccountClick() {
         launchCatching {
             accountService.deleteAccount()
         }
     }
 
-    fun getUsername(): String? {
-        return accountService.userName
-    }
 
+
+    /**
+     * Retrieves the email of the current logged-in user.
+     *
+     * @return The email of the user, or null if not available.
+     */
     fun getUserEmail(): String? {
         return accountService.userEmail
     }
 
-    fun getUserPhotoUrl(): Uri? {
-        return accountService.userPhotoUrl
-    }
 
-
+    /**
+     * Initializes the HomeViewModel by checking if a user is logged in.
+     * If no user is logged in, navigates to the SplashScreen.
+     *
+     * @param navController The NavController used for navigation.
+     */
     fun initialize(navController: NavController) {
         launchCatching {
             accountService.currentUser.collect { user ->
@@ -54,24 +70,41 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // Entfernt alle Nicht-Ziffern aus der ISBN
-    fun normalizeISBN(isbn: String): String {
+    /**
+     * Removes all non-digit characters from the ISBN.
+     *
+     * @param isbn The ISBN to normalize.
+     * @return The normalized ISBN containing only digits.
+     */
+    private fun normalizeISBN(isbn: String): String {
         return isbn.filter { it.isDigit() }
     }
 
-    // Überprüft, ob eine ISBN gültig ist.
-    fun isValidISBN(isbn: String): Boolean {
-        return  isbn.length == 10 || isbn.length == 13 && isbn.all { it.isDigit()  }
+    /**
+     * Checks if the given ISBN is valid.
+     *
+     * @param isbn The ISBN to validate.
+     * @return True if the ISBN is valid, false otherwise.
+     */
+    private fun isValidISBN(isbn: String): Boolean {
+        return isbn.length == 10 || isbn.length == 13 && isbn.all { it.isDigit() }
     }
 
-    //Sucht nach Büchern mit ISBN
+    /**
+     * Searches for books using the provided ISBN.
+     *
+     * @param rawIsbn The raw ISBN input.
+     * @param onSuccess Callback function invoked when book search succeeds with the found BookItem.
+     * @param onError Callback function invoked when book search encounters an error with an error message.
+     */
     fun searchBookByISBN(
         rawIsbn: String,
-        onSuccess: (BookItem) -> Unit, // Callback-Funktion, die bei Erfolg aufgerufen wird.
+        onSuccess: (BookItem) -> Unit,
         onError: (String) -> Unit
     ) {
         val isbn = normalizeISBN(rawIsbn)
 
+        // Validate ISBN
         if (!isValidISBN(isbn)) {
             onError("Invalid ISBN. Please check the number again.")
             return
@@ -79,18 +112,18 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val apiKey = BuildConfig.API_KEY
-                // val apiKey = BuildConfig.
+                val apiKey = BuildConfig.API_KEY // Retrieve API key from BuildConfig
                 val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
 
-                // Debugging: Ausgabe der Ergebnisse prüfen
+                // Log book search results for debugging
                 Log.d("BookSearch", "Total items found: ${bookResponse.items.size}")
-                Log.d("BookSearch", "Book title: ${bookResponse.items.first().volumeInfo.title}")
-                Log.d("BookSearch", "Thumbnail URL: ${bookResponse.items.first().volumeInfo.imageLinks?.thumbnail}")
+                if (bookResponse.items.isNotEmpty()) {
+                    val firstBook = bookResponse.items.first()
+                    Log.d("BookSearch", "Book title: ${firstBook.volumeInfo.title}")
+                    Log.d("BookSearch", "Thumbnail URL: ${firstBook.volumeInfo.imageLinks?.thumbnail}")
 
-                // Bei erfolgreicher Suche wird der erste Bucheintrag an den onSuccess Callback übergeben.
-                if(bookResponse.items.isNotEmpty()){
-                    onSuccess(bookResponse.items.first())
+                    // Invoke onSuccess callback with the first book item found
+                    onSuccess(firstBook)
                 } else {
                     onError("No books found for this ISBN.")
                 }

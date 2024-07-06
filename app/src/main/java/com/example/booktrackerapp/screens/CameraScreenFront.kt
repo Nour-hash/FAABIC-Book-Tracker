@@ -26,7 +26,6 @@ import androidx.navigation.NavController
 import com.example.booktrackerapp.ai.BookRecognitionModel
 import com.example.booktrackerapp.model.service.ImageUri
 import com.example.booktrackerapp.viewModel.CameraFrontViewModel
-import com.example.booktrackerapp.viewModel.CameraViewModel
 import com.example.booktrackerapp.widgets.CameraControls
 
 @Composable
@@ -66,6 +65,14 @@ fun CameraScreenFront(navController: NavController, cameraViewModel: CameraFront
                     cameraController.bindToLifecycle(lifecycleOwner)
                 }
             }
+        )
+
+        Box(
+            modifier = Modifier
+                .width(350.dp)
+                .height(500.dp)// Add padding to adjust the frame size as needed
+                .border(4.dp, White)  // Set border thickness and color
+                .align(Alignment.Center)  // Center the frame
         )
 
         // Show alert if no book is detected
