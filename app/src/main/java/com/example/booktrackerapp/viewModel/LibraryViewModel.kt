@@ -69,19 +69,50 @@ class LibraryViewModel @Inject constructor(
     }
 
     fun applyFilters(books: List<BookItem>): List<BookItem> {
-        return books.filter { book ->
-            val matchesName = filterState.value.name?.let { book.volumeInfo.title.contains(it, ignoreCase = true) } ?: true
-            val matchesGenre = filterState.value.genre?.let { genre ->
-                book.volumeInfo.categories?.any { it.contains(genre, ignoreCase = true) } ?: false
-            } ?: true || book.volumeInfo.categories == null
-            val matchesReadStatus = filterState.value.readStatus?.let { book.volumeInfo.isRead != it } ?: true
-            val matchesAuthor = filterState.value.author?.let { author ->
-                book.volumeInfo.authors?.any { it.contains(author, ignoreCase = true) } ?: true
-            } ?: true
+        val genreFilter = filterState.value.genre
 
-            matchesName && matchesGenre && matchesReadStatus && matchesAuthor
+        return if (genreFilter.isNullOrEmpty()) {
+            // No genre filter applied, return all books including those with null genre
+            books.filter { book ->
+                val matchesName = filterState.value.name?.let {
+                    book.volumeInfo.title.contains(it, ignoreCase = true)
+                } ?: true
+
+                val matchesReadStatus = filterState.value.readStatus?.let {
+                    book.volumeInfo.isRead == it
+                } ?: true
+
+                val matchesAuthor = filterState.value.author?.let { author ->
+                    book.volumeInfo.authors?.any { it.contains(author ?: "", ignoreCase = true) } ?: true
+                } ?: true
+
+                matchesName && matchesReadStatus && matchesAuthor
+            }
+        } else {
+            // Genre filter applied, return only books with the specified genre or partial match
+            books.filter { book ->
+                val matchesName = filterState.value.name?.let {
+                    book.volumeInfo.title.contains(it, ignoreCase = true)
+                } ?: true
+
+                val matchesGenre = book.volumeInfo.categories?.any { category ->
+                    category.contains(genreFilter, ignoreCase = true) ||
+                            category.startsWith(genreFilter, ignoreCase = true)
+                } ?: false
+
+                val matchesReadStatus = filterState.value.readStatus?.let {
+                    book.volumeInfo.isRead == it
+                } ?: true
+
+                val matchesAuthor = filterState.value.author?.let { author ->
+                    book.volumeInfo.authors?.any { it.contains(author ?: "", ignoreCase = true) } ?: true
+                } ?: true
+
+                matchesName && matchesGenre && matchesReadStatus && matchesAuthor
+            }
         }
     }
+
 
 
     fun setFilterCriteria(name: String? = null, genre: String? = null, readStatus: Boolean? = null, author: String? = null) {
