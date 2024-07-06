@@ -41,9 +41,7 @@ fun Userscreen(navController: NavController,viewModel: HomeViewModel) {
     var logoutAction by remember { mutableStateOf<() -> Unit>({}) }
 
     viewModel.initialize(navController)
-    val username = viewModel.getUsername()
     val userEmail = viewModel.getUserEmail()
-    val userPhotoUrl = viewModel.getUserPhotoUrl()
 
 
     BookTrackerAppTheme {
