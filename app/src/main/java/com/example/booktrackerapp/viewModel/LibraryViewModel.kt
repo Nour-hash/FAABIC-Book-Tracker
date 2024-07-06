@@ -57,32 +57,8 @@ class LibraryViewModel @Inject constructor(
             }
     }
 
-    fun deleteBook(bookId: String) {
-        val userId = accountService.currentUserId
-        val libraryId = "defaultLibrary"
 
-        db.collection("Users").document(userId)
-            .collection("Libraries").document(libraryId)
-            .collection("Books").document(bookId)
-            .delete()
-            .addOnSuccessListener {
-                booksState.value = booksState.value.filter { it.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier != bookId }
-            }
-            .addOnFailureListener { e ->
-                e.printStackTrace()
-                errorState.value = "Error deleting book."
-            }
-    }
 
-    fun sortBooksAscending() {
-        sortState.value = SortOrder.Ascending
-        booksState.value = booksState.value.sortedBy { it.volumeInfo.title }
-    }
-
-    fun sortBooksDescending() {
-        sortState.value = SortOrder.Descending
-        booksState.value = booksState.value.sortedByDescending { it.volumeInfo.title }
-    }
 
     fun applySorting(books: List<BookItem>): List<BookItem> {
         return when (sortState.value) {
@@ -98,7 +74,7 @@ class LibraryViewModel @Inject constructor(
             val matchesGenre = filterState.value.genre?.let { genre ->
                 book.volumeInfo.categories?.any { it.contains(genre, ignoreCase = true) } ?: false
             } ?: true || book.volumeInfo.categories == null
-            val matchesReadStatus = filterState.value.readStatus?.let { book.volumeInfo.isRead == it } ?: true
+            val matchesReadStatus = filterState.value.readStatus?.let { book.volumeInfo.isRead != it } ?: true
             val matchesAuthor = filterState.value.author?.let { author ->
                 book.volumeInfo.authors?.any { it.contains(author, ignoreCase = true) } ?: true
             } ?: true

@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
 import javax.inject.Inject
 import android.util.Log
+import com.example.booktrackerapp.BuildConfig
 
 
 @HiltViewModel
@@ -36,7 +37,7 @@ class DetailViewModel @Inject constructor(
     fun getBookDetails(isbn: String) {
         viewModelScope.launch {
             try {
-                val apiKey = "AIzaSyD0k6a0htp8NSBRC0229itvsTaQ4DPLipE"
+                val apiKey = BuildConfig.API_KEY
                 val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
 
                 if (bookResponse.items.isNotEmpty()) {

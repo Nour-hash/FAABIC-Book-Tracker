@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -23,6 +26,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Add buildConfigField to pass API_KEY to BuildConfig
+        // Load properties from local.properties file
+       // val localProperties: Properties = rootProject.ext["localProperties"] as Properties
+        //val apiKey: String? = localProperties["API_KEY"] as String?
+      //  buildConfigField("String", "API_KEY", "\"${apiKey ?: "$apiKey"}\"")
+
     }
 
     buildTypes {
@@ -32,6 +42,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            val p = gradleLocalProperties(rootDir)
+            p.load(project.rootProject.file("local.properties").reader())
+            val yourKey: String = p.getProperty("API_KEY")
+            buildConfigField("String", "API_KEY", "\"$yourKey\"")
+        }
+        debug {
+            val p = gradleLocalProperties(rootDir)
+            p.load(project.rootProject.file("local.properties").reader())
+            val yourKey: String = p.getProperty("API_KEY")
+            buildConfigField("String", "API_KEY", "\"$yourKey\"")
         }
     }
     compileOptions {
@@ -49,6 +69,7 @@ android {
         compose = true
         viewBinding = true
         mlModelBinding = true
+        buildConfig = true // Enable buildConfig feature
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"

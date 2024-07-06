@@ -2,6 +2,7 @@ package com.example.booktrackerapp.viewModel
 
 import android.net.Uri
 import android.util.Log
+import com.example.booktrackerapp.BuildConfig
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.booktrackerapp.api.BookItem
@@ -78,8 +79,8 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val apiKey = "AIzaSyD0k6a0htp8NSBRC0229itvsTaQ4DPLipE"
-               // val apiKey = BuildConfig.
+                val apiKey = BuildConfig.API_KEY
+                // val apiKey = BuildConfig.
                 val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
 
                 // Debugging: Ausgabe der Ergebnisse prüfen
