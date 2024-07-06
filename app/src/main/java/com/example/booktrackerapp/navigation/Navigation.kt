@@ -24,23 +24,28 @@ import com.example.booktrackerapp.viewModel.CameraViewModel
 import com.example.booktrackerapp.viewModel.HomeViewModel
 import com.example.booktrackerapp.viewModel.LibraryViewModel
 
-// Verwaltet alle Navigationspfade.
+// Manages all navigation paths.
 @Composable
 fun Navigation() {
+    // Remember the Nav Controller for navigation within the app
     val navController = rememberNavController()
+
+    // Initialize view models using Jetpack Compose's viewModel function
     val viewModel: HomeViewModel = viewModel()
     val cameraViewModel: CameraViewModel = viewModel()
     val cameraFrontViewModel: CameraFrontViewModel = viewModel()
-    val imageUriHolder = ImageUri()
     val libraryViewModel: LibraryViewModel = viewModel()
 
+    // Holds the image URI for passing between screens
+    val imageUriHolder = ImageUri()
 
-    // Definiert den Navigations-Host, der als Kontainer für die Navigationsscreens dient.
+
+    // Defines the navigation host that acts as a container for navigation screens
     NavHost(
         navController = navController,
-        startDestination = Screen.SplashScreen.route
+        startDestination = Screen.SplashScreen.route// Sets the start destination to SplashScreen
     ) {
-        // Definiert verschiedene Routen und die zugehörigen Composables für die Navigation.
+        // Defines various routes and their associated composables for navigation
         composable(Screen.HomeScreen.route) {
             HomeScreen(navController = navController,viewModel )
         }
