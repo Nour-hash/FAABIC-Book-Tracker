@@ -1,14 +1,11 @@
 package com.example.booktrackerapp.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -16,13 +13,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.booktrackerapp.ui.theme.BookTrackerAppTheme
 import com.example.booktrackerapp.viewModel.LibraryViewModel
+import com.example.booktrackerapp.viewModel.LibraryViewModel.SortOrder
 import com.example.booktrackerapp.widgets.BookRowSimple
 import com.example.booktrackerapp.widgets.SimpleBottomAppBar
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
 
 @Composable
 fun LibraryScreen(navController: NavController, libraryViewModel: LibraryViewModel = hiltViewModel()) {
-    LaunchedEffect(Unit) {
+    var sortOrder by rememberSaveable { mutableStateOf(SortOrder.None) }
+    var filterName by rememberSaveable { mutableStateOf("") }
+    var filterGenre by rememberSaveable { mutableStateOf("") }
+    var filterReadStatus by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var filterAuthor by rememberSaveable { mutableStateOf("") }
+
+    var selectedGenre by rememberSaveable { mutableStateOf("") }
+
+
+    LaunchedEffect(sortOrder, filterName, filterGenre, filterReadStatus, filterAuthor,selectedGenre) {
+        libraryViewModel.setFilterCriteria(filterName, filterGenre, filterReadStatus, filterAuthor)
+        libraryViewModel.sortState.value = sortOrder
         libraryViewModel.fetchBooks()
     }
 
@@ -34,7 +43,7 @@ fun LibraryScreen(navController: NavController, libraryViewModel: LibraryViewMod
             topBar = { SimpleTopAppBar(navController, title = "Library", backButton = false) },
             bottomBar = { SimpleBottomAppBar(navController) }
         ) { innerPadding ->
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
@@ -42,21 +51,83 @@ fun LibraryScreen(navController: NavController, libraryViewModel: LibraryViewMod
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                item {
-                    if (errorState.value != null) {
+                // Filter UI
+                TextField(
+                    value = filterName,
+                    onValueChange = { filterName = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                )
+                TextField(
+                    value = filterGenre,
+                    onValueChange = { filterGenre = it },
+                    label = { Text("Genre") },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                )
+                TextField(
+                    value = filterAuthor,
+                    onValueChange = { filterAuthor = it },
+                    label = { Text("Author") },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                ) {
+                    Text("Read Status")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    RadioButton(
+                        selected = filterReadStatus == true,
+                        onClick = { filterReadStatus = true }
+                    )
+                    Text("Read")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    RadioButton(
+                        selected = filterReadStatus == false,
+                        onClick = { filterReadStatus = false }
+                    )
+                    Text("Unread")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    RadioButton(
+                        selected = filterReadStatus == null,
+                        onClick = { filterReadStatus = null }
+                    )
+                    Text("All")
+                }
+
+                // Sort Buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick = { sortOrder = SortOrder.Ascending }) {
+                        Text("Sort Ascending")
+                    }
+                    Button(onClick = { sortOrder = SortOrder.Descending }) {
+                        Text("Sort Descending")
+                    }
+                }
+
+                if (errorState.value != null) {
                     Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
                 } else {
-                    booksState.value.forEach { book ->
-                        BookRowSimple(
-                            book = book,
-                            navController = navController,
-                            isClickable = true
-                        ) { bookId, isFavorite ->
-                            libraryViewModel.updateFavoriteStatus(bookId, isFavorite)
+                    LazyColumn(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        items(booksState.value) { book ->
+                            BookRowSimple(
+                                book = book,
+                                navController = navController,
+                                isClickable = true
+                            ) { bookId, isFavorite ->
+                                libraryViewModel.updateFavoriteStatus(bookId, isFavorite)
+                            }
                         }
                     }
-                } }
-
+                }
             }
         }
     }

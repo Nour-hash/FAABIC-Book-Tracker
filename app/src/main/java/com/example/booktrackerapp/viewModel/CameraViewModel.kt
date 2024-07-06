@@ -31,7 +31,7 @@ class CameraViewModel: ViewModel() {
         context: Context,
         cameraController: LifecycleCameraController,
         imageUriHolder: ImageUri,
-        navController: NavController
+        navController: NavController,
     ) {
         val mainExecutor = ContextCompat.getMainExecutor(context)
         cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback() {
@@ -56,8 +56,8 @@ class CameraViewModel: ViewModel() {
     }
 
     fun bitmapToUriConverter(bitmap: Bitmap, context: Context): Uri {
-        val imagesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val image = File(imagesDir, "${UUID.randomUUID()}.jpg")
+        val cacheDir = context.cacheDir
+        val image = File(cacheDir, "${UUID.randomUUID()}.jpg")
 
         try {
             val stream: OutputStream = FileOutputStream(image)

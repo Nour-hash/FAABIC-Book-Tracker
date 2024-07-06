@@ -1,3 +1,5 @@
+import java.util.Properties
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id("com.android.application") version "8.2.0" apply false
@@ -8,3 +10,13 @@ plugins {
     id("com.android.library") version "8.0.0" apply false
 
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { input ->
+        localProperties.load(input)
+    }
+}
+
+ext["localProperties"] = localProperties

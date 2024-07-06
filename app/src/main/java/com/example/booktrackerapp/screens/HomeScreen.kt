@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,7 +47,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HomeScreen(navController: NavController,viewModel: HomeViewModel, libraryViewModel: LibraryViewModel = hiltViewModel()) {
+fun HomeScreen(navController: NavController,viewModel: HomeViewModel, libraryViewModel: LibraryViewModel = hiltViewModel(), isbn: String? = null) {
 
     viewModel.initialize(navController)
 
@@ -61,6 +62,20 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel, libraryVie
     val hasPermission = cameraPermissionState.status.isGranted
     val onRequestPermission = cameraPermissionState::launchPermissionRequest
 
+    LaunchedEffect(isbn) {
+        isbn?.let {
+            viewModel.searchBookByISBN(
+                rawIsbn = it,
+                onSuccess = { book ->
+                    singlebookState.value = book
+                    errorState.value = ""
+                },
+                onError = { error ->
+                    errorState.value = error
+                }
+            )
+        }
+    }
 
     BookTrackerAppTheme {
         Scaffold(
@@ -161,7 +176,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel, libraryVie
                     onClick = {
                         //Zu CameraScreen wechseln, wenn Permission erteilt wurde
                         if (hasPermission) {
-                            navController.navigate("camerascreen")
+                            navController.navigate("camerascreenfront")
                         } else {
                             onRequestPermission()
                         }

@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -23,6 +26,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Add buildConfigField to pass API_KEY to BuildConfig
+        // Load properties from local.properties file
+       // val localProperties: Properties = rootProject.ext["localProperties"] as Properties
+        //val apiKey: String? = localProperties["API_KEY"] as String?
+      //  buildConfigField("String", "API_KEY", "\"${apiKey ?: "$apiKey"}\"")
+
     }
 
     buildTypes {
@@ -32,6 +42,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            val p = gradleLocalProperties(rootDir)
+            p.load(project.rootProject.file("local.properties").reader())
+            val yourKey: String = p.getProperty("API_KEY")
+            buildConfigField("String", "API_KEY", "\"$yourKey\"")
+        }
+        debug {
+            val p = gradleLocalProperties(rootDir)
+            p.load(project.rootProject.file("local.properties").reader())
+            val yourKey: String = p.getProperty("API_KEY")
+            buildConfigField("String", "API_KEY", "\"$yourKey\"")
         }
     }
     compileOptions {
@@ -48,6 +68,8 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        mlModelBinding = true
+        buildConfig = true // Enable buildConfig feature
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
@@ -60,6 +82,11 @@ android {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation("com.google.android.gms:play-services-drive:17.0.0")
+    implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
+    implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.3.0")
     // Version variables for consistency
     val lifecycleVersion = "2.7.0"
     val navigationVersion = "2.7.7"
@@ -134,4 +161,8 @@ dependencies {
 
     //Firestore
     implementation("com.google.firebase:firebase-firestore")
+
+    //Google ML kit
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+
 }
