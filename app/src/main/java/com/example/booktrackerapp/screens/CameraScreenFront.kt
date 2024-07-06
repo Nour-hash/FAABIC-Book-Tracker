@@ -11,6 +11,9 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +30,7 @@ import com.example.booktrackerapp.viewModel.CameraViewModel
 import com.example.booktrackerapp.widgets.CameraControls
 
 @Composable
-fun CameraScreenFront(navController: NavController, cameraViewModel: CameraFrontViewModel, imageUriHolder: ImageUri) {
+fun CameraScreenFront(navController: NavController, cameraViewModel: CameraFrontViewModel, imageUriHolder: ImageUri,showMessage: Boolean = false) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraController = remember { LifecycleCameraController(context) }
@@ -42,6 +45,8 @@ fun CameraScreenFront(navController: NavController, cameraViewModel: CameraFront
     }
 
     val bookRecognitionModel = remember { BookRecognitionModel(context) }
+    // Alert dialog state
+    var showAlert by remember { mutableStateOf(showMessage) }
 
     Box(
         modifier = Modifier
@@ -63,7 +68,19 @@ fun CameraScreenFront(navController: NavController, cameraViewModel: CameraFront
             }
         )
 
-
+        // Show alert if no book is detected
+        if (showAlert) {
+            AlertDialog(
+                onDismissRequest = { showAlert = false },
+                title = { Text("No Book Detected") },
+                text = { Text("Please make sure the book is clearly visible and try again.") },
+                confirmButton = {
+                    Button(onClick = { showAlert = false }) {
+                        Text("Dismiss")
+                    }
+                }
+            )
+        }
         // Camera Button Functions
         CameraControls(
             modifier = Modifier.align(Alignment.BottomCenter),

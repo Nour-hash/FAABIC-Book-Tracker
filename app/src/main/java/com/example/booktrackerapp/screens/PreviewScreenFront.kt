@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.AlertDialog
@@ -19,15 +20,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.booktrackerapp.ai.BookRecognitionModel
-import com.example.booktrackerapp.ai.extractISBNFromBitmap
 import com.example.booktrackerapp.model.service.ImageUri
-import java.io.File
+import com.example.booktrackerapp.viewModel.CameraFrontViewModel
 
 @Composable
-fun PreviewScreenFront(navController: NavController, imageUriHolder: ImageUri) {
+fun PreviewScreenFront(navController: NavController, imageUriHolder: ImageUri,viewModel: CameraFrontViewModel) {
     val context = LocalContext.current
     val bitmapUri = imageUriHolder.imageUri.value
-    var showPopup by remember { mutableStateOf(false) }
     val bookRecognitionModel = remember { BookRecognitionModel(context) }
 
     Box(
@@ -63,9 +62,10 @@ fun PreviewScreenFront(navController: NavController, imageUriHolder: ImageUri) {
                     val bitmap = loadBitmapFromUri(uri, context)
                     if (bookRecognitionModel.isBookImage(bitmap)) {
                         // Navigate back to HomeScreen with the extracted ISBN
+                        Log.d("AI_PREDICTION","is book")
                         navController.navigate("camerascreen")
                     } else {
-                        showPopup = true
+                        Log.d("AI_PREDICTION","is not book")
                     }
                 }
             }) {
@@ -73,21 +73,6 @@ fun PreviewScreenFront(navController: NavController, imageUriHolder: ImageUri) {
             }
         }
 
-        if (showPopup) {
-            AlertDialog(
-                onDismissRequest = { showPopup = false },
-                title = { Text(text = "Not a Book") },
-                text = { Text("The captured image is not recognized as a book. Please retake the picture.") },
-                confirmButton = {
-                    Button(onClick = {
-                        showPopup = false
-                        navController.navigate("cameraScreen")
-                    }) {
-                        Text("Retake")
-                    }
-                }
-            )
-        }
     }
 }
 

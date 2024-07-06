@@ -71,18 +71,21 @@ fun Navigation() {
         {
             CameraScreen(navController = navController, cameraViewModel = cameraViewModel, imageUriHolder = imageUriHolder)
         }
-        composable(Screen.CameraScreenFront.route)
-        {
-            CameraScreenFront(navController = navController, cameraViewModel = cameraFrontViewModel, imageUriHolder = imageUriHolder)
+        // Add the showMessage parameter to the CameraScreenFront route
+        composable(
+            route = Screen.CameraScreenFront.route + "?showMessage={showMessage}",
+            arguments = listOf(navArgument("showMessage") { type = NavType.BoolType; defaultValue = false })
+        ) { backStackEntry ->
+            val showMessage = backStackEntry.arguments?.getBoolean("showMessage") ?: false
+            CameraScreenFront(navController = navController, cameraViewModel = cameraFrontViewModel, imageUriHolder = imageUriHolder, showMessage = showMessage)
         }
-
         composable(Screen.PreviewScreen.route)
         {
             PreviewScreen(navController = navController, imageUriHolder = imageUriHolder)
         }
         composable(Screen.PreviewScreenFront.route)
         {
-            PreviewScreenFront(navController = navController, imageUriHolder = imageUriHolder)
+            PreviewScreenFront(navController = navController, imageUriHolder = imageUriHolder, viewModel= cameraFrontViewModel)
         }
         composable(
             route = Screen.DetailScreen.route + "/{isbn}",

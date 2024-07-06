@@ -23,6 +23,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.UUID
 import android.graphics.Matrix
+import android.util.Log
 import com.example.booktrackerapp.ai.BookRecognitionModel
 
 class CameraFrontViewModel: ViewModel() {
@@ -46,10 +47,14 @@ class CameraFrontViewModel: ViewModel() {
 
                 if (bookRecognitionModel.isBookImage(rotatedBitmap)) {
                     navController.navigate("previewScreenFront")
+                    Log.d("AI_PREDICTION","is book")
+
                 } else {
                     // Handle non-book image case (e.g., show a message or navigate back to camera screen)
                     // Here you might want to pass a parameter to show a message on the camera screen
                     navController.navigate("cameraScreenFront?showMessage=true")
+                    Log.d("AI_PREDICTION","is not book")
+
                 }
             }
         })
@@ -100,7 +105,7 @@ class CameraFrontViewModel: ViewModel() {
         data?.data?.let { uri ->
             chosenImageUri.value = uri
             imageUriHolder.setImageUri(uri)
-            navController.navigate("previewScreen")
+            navController.navigate("previewScreenFront")
         }
     }
 }
