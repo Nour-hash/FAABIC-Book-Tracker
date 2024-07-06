@@ -23,6 +23,7 @@ import com.example.booktrackerapp.viewModel.DetailViewModel
 import com.example.booktrackerapp.viewModel.LibraryViewModel
 import com.example.booktrackerapp.widgets.BookDetails
 import com.example.booktrackerapp.widgets.BookRowSimple
+import com.example.booktrackerapp.widgets.PagesReadInput
 import com.example.booktrackerapp.widgets.RatingBar
 import com.example.booktrackerapp.widgets.ReadStatusButton
 import com.example.booktrackerapp.widgets.SimpleTopAppBar
@@ -73,6 +74,7 @@ fun DetailScreen(
                     if (errorState.value != null) {
                         Text(text = errorState.value ?: "", color = MaterialTheme.colorScheme.error)
                     } else {
+                        // Show book details
                         bookDetailState.value?.let { book ->
                             BookRowSimple(
                                 book = book,
@@ -85,6 +87,7 @@ fun DetailScreen(
                             BookDetails(Modifier, book = book)
                             Spacer(modifier = Modifier.height(8.dp))
                             if (isBookInLibrary) {
+                                // Show read status button
                                 ReadStatusButton(isRead = isRead) {
                                     viewModel.toggleReadStatus(
                                         book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier
@@ -92,6 +95,7 @@ fun DetailScreen(
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
+                                // Show delete book button
                                 Button(onClick = {
                                     book.volumeInfo.industryIdentifiers?.firstOrNull()
                                         ?.let { viewModel.deleteBook(it.identifier) }
@@ -99,6 +103,20 @@ fun DetailScreen(
                                 }) {
                                     Text("Delete Book")
                                 }
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Show input for pages read
+                                PagesReadInput(
+                                    pagesRead = book.volumeInfo.pagesRead ?: 0,
+                                    totalPageCount = book.volumeInfo.pageCount ?: 0,
+                                    onPagesReadChange = { pagesRead ->
+                                        // Get the identifier safely
+                                        val identifier = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier
+                                        if (identifier != null) {
+                                            viewModel.updatePagesRead(identifier, pagesRead)
+                                        }
+                                    }
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 RatingBar(rating = rating) { newRating ->
                                     viewModel.updateRating(

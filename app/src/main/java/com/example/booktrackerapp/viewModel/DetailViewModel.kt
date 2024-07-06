@@ -74,6 +74,12 @@ class DetailViewModel @Inject constructor(
                 isBookInLibrary.value = true
                 _readState.value = snapshot.getBoolean("volumeInfo.isRead") ?: false
                 _ratingState.value = snapshot.getLong("volumeInfo.userRating")?.toInt()
+
+                // Fetch pages read if available
+                val pagesRead = snapshot.getLong("volumeInfo.pagesRead")?.toInt() ?: 0
+                bookDetailState.value = bookDetailState.value?.copy(
+                    volumeInfo = bookDetailState.value!!.volumeInfo.copy(pagesRead = pagesRead)
+                )
             } else {
                 isBookInLibrary.value = false
             }
@@ -142,6 +148,31 @@ class DetailViewModel @Inject constructor(
             }
     }
 
+    // Updates the number of pages read for a book
+    fun updatePagesRead(bookId: String, pagesRead: Int) {
+        val userId = accountService.currentUserId
+        val libraryId = "defaultLibrary"
+
+        Log.d("DetailViewModel", "Updating pages read for book ID: $bookId to $pagesRead")
+
+        db.collection("Users").document(userId)
+            .collection("Libraries").document(libraryId)
+            .collection("Books").document(bookId)
+            .update("volumeInfo.pagesRead", pagesRead)
+            .addOnSuccessListener {
+                bookDetailState.value = bookDetailState.value?.copy(
+                    volumeInfo = bookDetailState.value!!.volumeInfo.copy(pagesRead = pagesRead)
+                )
+                Log.d("DetailViewModel", "Pages read updated successfully to $pagesRead")
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+                errorState.value = "Error updating pages read."
+                Log.e("DetailViewModel", "Error updating pages read for book ID: $bookId", e)
+            }
+    }
+
+    // Deletes a book from the library
     fun deleteBook(bookId: String) {
         val userId = accountService.currentUserId
         val libraryId = "defaultLibrary"

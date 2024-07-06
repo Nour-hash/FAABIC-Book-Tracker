@@ -23,7 +23,6 @@ data class VolumeInfo(
     val publisher: String? = null,
     val publishedDate: String? = null,
     val description: String? = null,
-    val pageCount: Int? = null,
     val dimensions: Dimensions? = null,
     val mainCategory: String? = null,
     val averageRating: Double? = null,
@@ -34,6 +33,7 @@ data class VolumeInfo(
     val categories: List<String>? = null,
     val notes: String? = null,  // Personal notes about the book
     val isRead: Boolean? = false,  // Reading status
+    val pageCount: Int? = null, // Total number of pages
     val pagesRead: Int? = 0,  // Number of pages read
     val isFavorite: Boolean? = false,  // Favorite status
     val userRating: Int? = null
