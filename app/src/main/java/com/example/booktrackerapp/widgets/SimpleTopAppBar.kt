@@ -68,7 +68,11 @@ fun SimpleTopAppBar(navController: NavController, title: String, backButton: Boo
             },
             text = {
                 Text(
-                    text = "This is the guide text. Replace it with your actual guide instructions.",
+                    text =  "HOW TO USE FAABIC:                                           If you want to search a book that you like you have " +
+                            "two options to do so. First would be to write the isbn of your book in the search bar and " +
+                            "the Second option would be to use our own AI to search for your book " +
+                            "just Click on the Camera Icon in the home-screen and take pictures of the front and back of the book and then it should give you details to your desired book " +
+                            "then you can save it in your library for later viewing",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
