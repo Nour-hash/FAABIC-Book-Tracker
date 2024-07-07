@@ -99,6 +99,7 @@ fun BookRowSimple(
     }
 }
 
+// Header für die Buchkarte mit Buchcover und Favoritenstatus
 @Composable
 fun BookCardHeader(imageUrl: String, isFavorite: Boolean, onFavoriteClick: () -> Unit) {
     Box(
@@ -112,6 +113,7 @@ fun BookCardHeader(imageUrl: String, isFavorite: Boolean, onFavoriteClick: () ->
     }
 }
 
+// Anzeige des Buchcovers
 @Composable
 fun BookImage(imageUrl: String) {
     SubcomposeAsyncImage(
@@ -126,6 +128,7 @@ fun BookImage(imageUrl: String) {
     )
 }
 
+// Anzeige des Favoriten-Icons
 @Composable
 fun FavoriteIcon(isFavorite: Boolean, onFavoriteClick: () -> Unit) {
     Box(
@@ -189,6 +192,7 @@ fun BookDetails(modifier: Modifier, book: BookItem) {
 
 }
 
+// Anzeige eines Detailtextes mit einem Label und dem Inhalt
 @Composable
 fun DetailText(label: String, content: String) {
     Text(buildAnnotatedString {
@@ -212,8 +216,10 @@ fun ReadStatusButton(isRead: Boolean, onClick: () -> Unit) {
     }
 }
 
+// Bewertungskomponente für Bücher
 @Composable
 fun RatingBar(rating: Int?, onRatingChanged: (Int) -> Unit) {
+    // Der aktuelle Bewertungsstatus
     val currentRating = remember { mutableIntStateOf(rating ?: 0) }
 
     // Log the current rating to verify it's being set correctly
@@ -221,26 +227,31 @@ fun RatingBar(rating: Int?, onRatingChanged: (Int) -> Unit) {
 
 
     Row {
+        // Erstellt 5 Sterne-Icons für die Bewertung
         (1..5).forEach { star ->
             IconButton(onClick = {
+                // Aktualisiert den aktuellen Bewertungsstatus, wenn ein Stern angeklickt wird
                 currentRating.value = star
                 onRatingChanged(star)
                 Log.d("RatingBar", "Star clicked: $star, newRating: ${currentRating.value}")
             }) {
                 Box(contentAlignment = Alignment.Center) {
                     if (star <= currentRating.value) {
+                        // Zeigt gefüllte Sterne für die aktuelle Bewertung
                         Icon(
                             imageVector = Icons.Filled.Star,
                             contentDescription = "Star",
                             tint = Color.Yellow
                         )
                     } else {
+                        // Zeigt leere Sterne für Bewertungen, die nicht ausgewählt wurden
                         Icon(
                             imageVector = Icons.Outlined.Star,
                             contentDescription = "Star Outline",
                             tint = Color.Gray
                         )
                     }
+                    // Zeigt die Zahl des Sterns an
                     Text(
                         text = star.toString(),
                         style = MaterialTheme.typography.bodySmall,

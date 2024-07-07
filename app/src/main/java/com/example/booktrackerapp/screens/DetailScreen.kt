@@ -37,6 +37,7 @@ fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
     libraryViewModel: LibraryViewModel = hiltViewModel()
 ) {
+    // States aus dem ViewModel abrufen
     val bookDetailState = viewModel.bookDetailState
     val errorState = viewModel.errorState
     val isRead = viewModel.readState.value ?: false  // Abrufen des Lesestatus als lokale Variable
@@ -45,6 +46,7 @@ fun DetailScreen(
     val isBookInLibrary = viewModel.isBookInLibrary.value
 
 
+    // Effekt starten, um Buchdetails basierend auf der ISBN abzurufen
     LaunchedEffect(isbn) {
         viewModel.getBookDetails(isbn)
     }
@@ -54,6 +56,7 @@ fun DetailScreen(
             SimpleTopAppBar(navController = navController, title = "Book Details", backButton = true)
         }
     ) { innerPadding ->
+        // Ladeanzeige anzeigen, wenn Daten geladen werden
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -118,6 +121,7 @@ fun DetailScreen(
                                     }
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
+                                // Bewertungsleiste anzeigen
                                 RatingBar(rating = rating) { newRating ->
                                     viewModel.updateRating(
                                         book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier
