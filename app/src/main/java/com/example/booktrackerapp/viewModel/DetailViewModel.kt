@@ -20,28 +20,33 @@ class DetailViewModel @Inject constructor(
     private val accountService: AccountService
 ) : BookTrackerViewModel() {
 
-    val bookDetailState = mutableStateOf<BookItem?>(null)
+    val bookDetailState = mutableStateOf<BookItem?>(null) // Enthält die detaillierten Buchinformationen
     val errorState = mutableStateOf<String?>(null)
     private val _readState = mutableStateOf(false)// Zustand für gelesen/nicht gelesen
     val readState: State<Boolean> = _readState
     private val _ratingState = mutableStateOf<Int?>(null) // Zustand für Bewertung
     val ratingState: State<Int?> = _ratingState
     val isLoading = mutableStateOf(false) // Zustand für Ladeanzeige
-    val isBookInLibrary = mutableStateOf(false)
+    val isBookInLibrary = mutableStateOf(false) // Gibt an, ob das Buch bereits in der Bibliothek des Benutzers ist
 
 
-
+    // Firestore-Instanz zur Interaktion mit der Datenbank
     private val db = FirebaseFirestore.getInstance()
 
 
+    // Funktion zum Abrufen der Buchdetails von der Google Books API mithilfe der ISBN
     fun getBookDetails(isbn: String) {
         viewModelScope.launch {
             try {
                 val apiKey = BuildConfig.API_KEY
+                // Netzwerkanfrage zum Abrufen der Buchdetails anhand der ISBN
                 val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
 
+                // Überprüfen, ob die API-Antwort ein Buch enthält
                 if (bookResponse.items.isNotEmpty()) {
+                    // Erstes Buch aus der Antwort abrufen
                     val book = bookResponse.items.first()
+                    // Den State mit den abgerufenen Buchdetails aktualisieren
                     bookDetailState.value = book
                     Log.d("DetailViewModel", "Book details fetched: ${book.volumeInfo.title}")
 
@@ -58,6 +63,7 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    // Funktion zum Überprüfen, ob das Buch in der Bibliothek ist und zum Abrufen zusätzlicher Daten von Firestore
     private fun checkBookInLibraryAndFetchBookData(book: BookItem) {
         val bookId = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: return
         val userId = accountService.currentUserId
@@ -86,12 +92,14 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    // Funktion zum Umschalten des Status gelesen/ungelesen eines Buches
     fun toggleReadStatus(bookId: String) {
         val newStatus = !_readState.value
         _readState.value = newStatus
         updateReadStatus(bookId, newStatus)
     }
 
+    // Funktion zum Speichern eines Buches in der Bibliothek des Benutzers
     fun saveBook(libraryId: String, book: BookItem) {
         val bookId = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: return
         val userId = accountService.currentUserId
