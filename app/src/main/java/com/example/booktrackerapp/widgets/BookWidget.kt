@@ -24,12 +24,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -248,4 +251,39 @@ fun RatingBar(rating: Int?, onRatingChanged: (Int) -> Unit) {
         }
     }
 }
+
+@Composable
+fun PagesReadInput(pagesRead: Int, totalPageCount: Int, onPagesReadChange: (Int) -> Unit) {
+    val nonNullPagesRead = pagesRead ?: 0 // Provide a default value of 0 if pagesRead is null
+    var inputText by remember { mutableStateOf(nonNullPagesRead.toString()) } // State to keep track of the input text
+    val progress = if (totalPageCount > 0) (nonNullPagesRead / totalPageCount.toFloat()) * 100 else 0f  // Calculate progress percentage, ensuring no division by zero
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // Display reading progress percentage only if totalPageCount > 0
+        if (totalPageCount > 0) {
+            Text("Reading Progress: ${progress.toInt()}%")
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // Input field for pages read
+        OutlinedTextField(
+            value = inputText,
+            onValueChange = { newText ->
+                // Allow only numeric input
+                if (newText.all { it.isDigit() }) {
+                    val newPagesRead = newText.toIntOrNull() ?: 0
+
+                    // Ensure pagesRead does not exceed totalPageCount if totalPageCount > 0
+                    if (totalPageCount == 0 || newPagesRead <= totalPageCount) {
+                        inputText = newText
+                        onPagesReadChange(newPagesRead)
+                    }
+                }
+            },
+            label = { Text("Pages Read") },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
 

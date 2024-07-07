@@ -23,13 +23,16 @@ class DetailViewModel @Inject constructor(
     private val accountService: AccountService
 ) : ViewModel() {
 
+
     // Mutable state for holding book details, read status, and error messages
     val bookDetailState = mutableStateOf<BookItem?>(null)
+
     val errorState = mutableStateOf<String?>(null)
     private val _readState = mutableStateOf(false) // State for read status (read or not read)
     val readState: State<Boolean> = _readState
     private val _ratingState = mutableStateOf<Int?>(null) // State for rating
     val ratingState: State<Int?> = _ratingState
+
     val isLoading = mutableStateOf(false) // Loading indicator state
     val isBookInLibrary = mutableStateOf(false) // State to indicate if the book is in the user's library
 
@@ -41,14 +44,19 @@ class DetailViewModel @Inject constructor(
      *
      * @param isbn ISBN of the book to fetch details for.
      */
+
     fun getBookDetails(isbn: String) {
         viewModelScope.launch {
             try {
                 val apiKey = BuildConfig.API_KEY
+                // Netzwerkanfrage zum Abrufen der Buchdetails anhand der ISBN
                 val bookResponse = GoogleBooksApiClient.service.searchBooksByISBN("isbn:$isbn", apiKey)
 
+                // Überprüfen, ob die API-Antwort ein Buch enthält
                 if (bookResponse.items.isNotEmpty()) {
+                    // Erstes Buch aus der Antwort abrufen
                     val book = bookResponse.items.first()
+                    // Den State mit den abgerufenen Buchdetails aktualisieren
                     bookDetailState.value = book
                     Log.d("DetailViewModel", "Book details fetched: ${book.volumeInfo.title}")
 
@@ -65,11 +73,13 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+
     /**
      * Function to check if the book is already in the user's library and fetch read status and rating.
      *
      * @param book The BookItem object representing the book to check.
      */
+
     private fun checkBookInLibraryAndFetchBookData(book: BookItem) {
         val bookId = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: return
         val userId = accountService.currentUserId
@@ -85,25 +95,36 @@ class DetailViewModel @Inject constructor(
         // Fetch the book document
         docRef.get().addOnSuccessListener { snapshot ->
             if (snapshot != null && snapshot.exists()) {
+
                 isBookInLibrary.value = true // Book is in the library
                 _readState.value = snapshot.getBoolean("volumeInfo.isRead") ?: false // Fetch read status
                 _ratingState.value = snapshot.getLong("volumeInfo.userRating")?.toInt() // Fetch rating
+
+                // Fetch pages read if available
+                val pagesRead = snapshot.getLong("volumeInfo.pagesRead")?.toInt() ?: 0
+                bookDetailState.value = bookDetailState.value?.copy(
+                    volumeInfo = bookDetailState.value!!.volumeInfo.copy(pagesRead = pagesRead)
+                )
+
             } else {
                 isBookInLibrary.value = false // Book is not in the library
             }
         }
     }
 
+
     /**
      * Function to toggle the read status of a book.
      *
      * @param bookId The ID of the book in Firestore.
      */
+
     fun toggleReadStatus(bookId: String) {
         val newStatus = !_readState.value
         _readState.value = newStatus // Update read status state
         updateReadStatus(bookId, newStatus) // Update read status in Firestore
     }
+
 
     /**
      * Function to save a book to the user's library in Firestore.
@@ -111,6 +132,7 @@ class DetailViewModel @Inject constructor(
      * @param libraryId The ID of the user's library.
      * @param book The BookItem object representing the book to save.
      */
+
     fun saveBook(libraryId: String, book: BookItem) {
         val bookId = book.volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: return
         val userId = accountService.currentUserId
@@ -180,11 +202,33 @@ class DetailViewModel @Inject constructor(
             }
     }
 
-    /**
-     * Function to delete a book from the user's library in Firestore.
-     *
-     * @param bookId The ID of the book in Firestore.
-     */
+
+    // Updates the number of pages read for a book
+    fun updatePagesRead(bookId: String, pagesRead: Int) {
+        val userId = accountService.currentUserId
+        val libraryId = "defaultLibrary"
+
+        Log.d("DetailViewModel", "Updating pages read for book ID: $bookId to $pagesRead")
+
+        db.collection("Users").document(userId)
+            .collection("Libraries").document(libraryId)
+            .collection("Books").document(bookId)
+            .update("volumeInfo.pagesRead", pagesRead)
+            .addOnSuccessListener {
+                bookDetailState.value = bookDetailState.value?.copy(
+                    volumeInfo = bookDetailState.value!!.volumeInfo.copy(pagesRead = pagesRead)
+                )
+                Log.d("DetailViewModel", "Pages read updated successfully to $pagesRead")
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+                errorState.value = "Error updating pages read."
+                Log.e("DetailViewModel", "Error updating pages read for book ID: $bookId", e)
+            }
+    }
+
+    // Deletes a book from the library
+
     fun deleteBook(bookId: String) {
         val userId = accountService.currentUserId
         val libraryId = "defaultLibrary"
